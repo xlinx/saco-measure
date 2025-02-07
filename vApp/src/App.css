@@ -1,10 +1,75 @@
-#root {
-  max-width: 1280px;
+root#root {
+  max-width: 100%;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
 }
+.mainLayout{
+  /*display: flex;*/
+  /*justify-content: space-between;*/
+  align-items: center;
+  width: 100%;
+  background-color: #111;
+}
+.cardContent{
+  background-color: #333;
+  border: 2px #646cff;
+  width: 90%;
+  padding: 1%;
+  margin: 1%;
+  box-shadow: rgba(255, 255, 255, 0.2) 0px 0px 0px 1px inset, rgba(0, 0, 0, 0.9) 0px 0px 0px 1px;
 
+
+}
+.pageMarquee{
+  background-color: #222;
+
+}
+.mainContent{
+  /*min-width: 900px;*/
+  width: 100%;
+  /*min-height: 100vh;*/
+  /*max-width: 1200px;*/
+
+  /*height: calc(100vh - 100px);*/
+}
+.appHeader{
+  position: sticky;
+  text-align: center;
+  top: 0;
+  z-index: 1;
+  /*width: 100vw;*/
+  /*display: flex;*/
+  /*align-items: center;*/
+  border-bottom: 1px dashed #444;
+  background-color: #222;
+}
+.contentHeader{
+  /*width: 100%;*/
+  height: 24px;
+  position: relative;
+  border: 0 solid #f00;
+  background-color: #222;
+  z-index: 0;
+  /*border-bottom: 2px dashed #444;*/
+  /*padding: 5px;*/
+  /*margin: 5px;*/
+}
+.contentFooter{
+  width: 80%;
+  text-align: center;
+  border-top: 1px dashed #888;
+  padding-bottom:100px;
+  background-color: rgba(255,255,255,0.0);
+
+}
+.flexBorderRadius{
+  width: 100%;
+  height: 100%;
+  border: 6px double #ff7875;
+  padding: 20px;
+  border-radius: 6px;
+}
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -17,26 +82,235 @@
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
-
+.logo-spin{
+  animation: logo-spin infinite 2s ease-in-out alternate;
+}
 @keyframes logo-spin {
-  from {
+  0% {
+    transform: rotate(-3deg);
+  }
+  50% {
     transform: rotate(0deg);
   }
-  to {
-    transform: rotate(360deg);
+  100% {
+    transform: rotate(3deg);
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
+/*@media (prefers-reduced-motion: no-preference) {*/
+/*  a:nth-of-type(2) .logo {*/
+/*    animation: logo-spin infinite 20s linear;*/
+/*  }*/
+/*}*/
 
 .card {
   padding: 2em;
 }
-
+.NavBar{
+  background-color: #1a1a1a;
+  position: fixed;
+}
+.bottomStatus{
+  position:absolute;
+  width:100%;
+  height:30px;
+  left:0;
+  padding: 0;
+  text-align: right;
+  right: 0;
+  z-index: 1000;
+  border-top: 1px solid #555;
+  background: #333;
+}
 .read-the-docs {
   color: #888;
+}
+.blink {
+  animation: blinker 1s step-start infinite;
+}
+@keyframes specialFadeRed {
+  0% {
+    color: #7eff49;
+  }
+  100% {
+    color: #f00;
+  }
+}
+@keyframes specialFade {
+  0% {
+    color: #00ff00;
+  }
+  50% {
+    color: #7eff49;
+  }
+  100% {
+    color: #f00;
+  }
+}
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+.bottomMenu{
+  /*display: flex;*/
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  /*top:0px;*/
+  width: 100%;
+  /*z-index: 5;*/
+  background-color: #1b1b1f;
+  /*color: white;*/
+  /*text-align: center;*/
+}
+
+.chessBackground{
+  background-image:
+          linear-gradient(45deg, #ccc 25%, transparent 25%),
+          linear-gradient(-45deg, #ccc 25%, transparent 25%),
+          linear-gradient(45deg, transparent 75%, #ccc 75%),
+          linear-gradient(-45deg, #eee 75%, #ccc 75%);
+  background-size: 10px 10px;
+}
+
+.target_video p {
+  /*position: absolute;*/
+  /*top: 10px;*/
+  /*left: 0;*/
+  line-height: 0;
+  text-align: center;
+  color: #fff;
+}
+.target p {
+  /*position: absolute;*/
+  /*top: 10px;*/
+  /*left: 0;*/
+  line-height: 0;
+  text-align: center;
+
+}
+
+.target_video {
+  /*position: absolute;*/
+  /*display: block;*/
+  /*width: auto;*/
+  /*width: calc(640px/2);*/
+  /*height: calc(320px/2);*/
+  /*top: 0;*/
+  /*left: 0;*/
+  padding: 2%;
+  /*line-height: 0px;*/
+  text-align: center;
+  background: rgba(222, 222, 1, 0.5);;
+  color: #fff;
+  font-weight: bold;
+  /*border: 1px solid #333;*/
+  /*box-sizing: border-box;*/
+
+}
+.target_input {
+  position: absolute;
+  /*width: 200px;*/
+  /*height: 200px;*/
+  top: 0;
+  left: 0;
+  /*line-height: 0px;*/
+  text-align: center;
+  background: rgba(222, 222, 1, 0.5);;
+  color: #333;
+  font-weight: bold;
+  border: 1px solid #333;
+  box-sizing: border-box;
+
+}
+.target_output {
+  position: absolute;
+  /*width: 400px;*/
+  /*height: 400px;*/
+  /*line-height: 150%;*/
+  text-align: center ;
+
+  background: rgba(11, 11, 11, 0.8);
+  color: #aaa;
+  font-weight: bold;
+  border: 1px solid #aaa;
+  box-sizing: border-box;
+}
+/*.viewport {*/
+/*    position: absolute;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    width: 100%;*/
+/*    height: calc(100vh - 100px);*/
+/*    overflow: auto;*/
+/*}*/
+
+/*.viewport:before {*/
+/*    content: "";*/
+/*    display: block;*/
+/*    position: absolute;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    height: 300%;*/
+/*    width: 100%;*/
+/*    background: linear-gradient(#333, #fff);*/
+/*}*/
+.cube {
+  display: inline-block;
+  border-radius: 5px;
+  width: 40px;
+  height: 40px;
+  margin: 4px;
+  background: #eee;
+  --color: #faf;
+  line-height: 40px;
+}
+
+
+/* pos guidelines */
+.moveable-normal.red {
+  background: red !important;
+}
+
+/* gap guidelines */
+.moveable-gap.red {
+  background: red !important;
+}
+
+/* When snapped to an element in elementGuidelines */
+.moveable-bold.red {
+  background: red !important;
+}
+
+/* A dashed line between target and element */
+.moveable-dashed.red {
+  border-top-color: red !important;
+  border-left-color: red !important;
+}
+
+/* pos guidelines */
+.moveable-normal.green {
+  background: green !important;
+}
+
+/* gap guidelines */
+.moveable-gap.green {
+  background: green !important;
+}
+
+/* When snapped to an element in elementGuidelines */
+.moveable-bold.green {
+  background: green !important;
+}
+
+/* A dashed line between target and element */
+.moveable-dashed.green {
+  border-top-color: green !important;
+  border-left-color: green !important;
+}
+
+.selecto-area .selected {
+  color: #fff;
+  background: var(--color);
 }

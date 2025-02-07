@@ -11,6 +11,8 @@ export default defineConfig({
   },
   renderer: {
     resolve: {
+      preserveSymlinks: true,
+
       alias: {
         '@renderer': resolve('src/renderer/src')
       }

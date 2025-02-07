@@ -8,7 +8,7 @@
   "scripts": {
     "e_format": "prettier --write .",
     "e_lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
-    "e_start": "electron-vite preview",
+    "e_preview": "electron-vite preview",
     "e_dev": "electron-vite dev",
     "e_build": "electron-vite build",
     "e_postinstall": "electron-builder install-app-deps",
@@ -19,7 +19,16 @@
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
-    "@electron-toolkit/utils": "^3.0.0"
+    "@electron-toolkit/utils": "^3.0.0",
+    "antd": "latest",
+    "antd-mobile-icons": "latest",
+    "inferencejs": "^1.0.16",
+    "react": "^19.0.0",
+    "react-bootstrap-icons": "^1.11.5",
+    "react-dom": "^19.0.0",
+    "react-fast-marquee": "^1.6.5",
+    "react-router-dom": "^7.1.5",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^1.0.2",
