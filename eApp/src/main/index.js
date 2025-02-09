@@ -1,8 +1,9 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
+require('@electron/remote/main').initialize()
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -15,6 +16,10 @@ function createWindow() {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
       devTools: is.dev,
+      nodeIntegration: true,
+      contextIsolation: false,
+      webSecurity: false,
+      enableRemoteModule: true
     }
   })
 
@@ -50,10 +55,14 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
-
+  function wait(milliseconds) {
+    return new Promise((resolve) => setTimeout(resolve, 2000))
+  }
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
-
+  ipcMain.handle('toMain', async (event, ...args) => {
+    return await wait(...args)
+  })
   createWindow()
 
   app.on('activate', function () {

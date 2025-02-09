@@ -3,30 +3,31 @@
  */
 import {
     Image,
-    Flex,
-    Typography,
-    FloatButton,
+
     Space,
     Card,
-    Avatar,
+
     Divider,
-    Timeline,
+    Radio,
     Layout,
     Breadcrumb,
     Menu,
     theme,
     ConfigProvider,
-    Alert,
-    Tag,
-    Button, Slider, Input,
+      Slider, Input,
 
 } from 'antd';
+import { HomeOutlined, UserOutlined } from '@ant-design/icons';
+
+// import remote from '@electron/remote';
+// const { BrowserWindow } = require('@electron/remote')
+
 const { Search } = Input;
 const { Header, Content, Footer } = Layout;
 import sacoSvgLogo3 from '../assets/sacoSvgLogo3.svg'
 import {AppOutline, StarFill, UnorderedListOutline,} from "antd-mobile-icons";
 import {MenuUnfoldOutlined,AudioOutlined} from "@ant-design/icons";
-import Marquee from "react-fast-marquee";
+// import Marquee from "react-fast-marquee";
 import { createStyles } from 'antd-style';
 import {UploadX} from "./UploadX.jsx";
 
@@ -53,10 +54,7 @@ const useStyle = createStyles(({ prefixCls, css }) => ({
     }
   `,
 }));
-const items2 = new Array(3).fill(null).map((_, index) => ({
-    key: index + 1,
-    label: `nav ${index + 1}`,
-}));
+
 const items = [
     {
         key: '/tab1',
@@ -84,9 +82,7 @@ const items = [
     }
 ]
 
-function AntDesignOutlined() {
-    return null;
-}
+
 const marks = {
     0: '0%',
     50: '50%',
@@ -116,10 +112,11 @@ const StaticHTML = () => {
                 className: styles.linearGradientButton,
             }}
         >
-        <Layout style={{ height:'100vh', width:'100vw', margin:'0px',padding: '3px' }}>
+        <Layout >
             <Header
                 style={{
                     display: 'flex',
+                    width:"100%",
                     alignItems: 'center',
                 }}
             >
@@ -153,17 +150,32 @@ const StaticHTML = () => {
             {/*           </Marquee>*/}
             {/*       }*/}
             {/*/>*/}
-            <Content style={{  margin:'0px',padding: '30px' }}>
+            <Content style={{  margin:'0px',padding: '20px' }}>
 
                 <Breadcrumb
                     style={{
                         margin: '16px 0',
                     }}
-                >
-                    <Breadcrumb.Item>Home</Breadcrumb.Item>
-                    <Breadcrumb.Item>Saco Control Center</Breadcrumb.Item>
-                    <Breadcrumb.Item>Work1</Breadcrumb.Item>
-                </Breadcrumb>
+                    items={[
+                        {
+                            href: '',
+                            title: <HomeOutlined />,
+                        },
+                        {
+                            href: '',
+                            title: (
+                                <>
+                                    <UserOutlined />
+                                    <span>Work</span>
+                                </>
+                            ),
+                        },
+                        {
+                            title: 'saco-greenPoly Feature',
+                        },
+                    ]}
+                />
+
                 <Card
                     hoverable
                     style={{
@@ -171,11 +183,20 @@ const StaticHTML = () => {
                     }}
                     // cover={<Image alt="example" src={sacoSvgLogo3} width="100px" />}
                 >
+                    <Divider style={{borderColor: '#333'}} orientation="center" >Model Setting</Divider>
+
                     <Space>
+                        <Radio.Group defaultValue="m" buttonStyle="solid">
+                            <Radio.Button value="n" disabled>nano|5Mb</Radio.Button>
+                            <Radio.Button value="s" disabled>small|30Mb</Radio.Button>
+                            <Radio.Button value="m"         >Medium|70Mb</Radio.Button>
+                            <Radio.Button value="l" disabled>Large|150Mb</Radio.Button>
+                            <Radio.Button value="x" disabled>Xtra|350Mb</Radio.Button>
+                        </Radio.Group>
                     <Search
-                        addonBefore="Trained ai-Model Select"
+                        addonBefore="Model Select"
                         placeholder=" (default: best.pt)"
-                        enterButton="Switch AI Model"
+                        enterButton="Switch Model"
                         size="large"
                         suffix={<AudioOutlined
                             style={{
@@ -183,11 +204,21 @@ const StaticHTML = () => {
                                 color: '#1677ff',
                             }}
                         />}
-                        onSearch={(value, _e, info) => console.log(info?.source, value)}
+                        onSearch={
+                            (val) => {
+                                // let indexMain=new remote.BrowserWindow({width:200})
+                                // indexMain.loadURL('http://localhost:3000/#/tab1')
+                                window.electron?.ipcRenderer.invoke('toMain',
+                                    { case: 'handleFileOpen',value: val}).then(
+                                        (r) => {
+                                            console.log('[][P4][invoke]r=', r)
+                                        }
+                                    )
+                            }
+                        }
                     />
-                    <Button type="primary" size="large" icon={<AntDesignOutlined />}>
-                        [AI] Select saco Image
-                    </Button>
+
+
 
                     </Space>
                     <Divider style={{borderColor: '#333'}} orientation="center" >Predict conferdence</Divider>
