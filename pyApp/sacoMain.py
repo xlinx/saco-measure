@@ -1,6 +1,6 @@
-
 import os
 import time
+from enum import Enum
 from pathlib import Path
 import datetime
 import glob
@@ -10,53 +10,56 @@ import numpy as np
 
 from ultralytics import YOLO
 # from shapely.geometry import Polygon
+DECADE_MODEL='best.pt'
+home = Path.home().joinpath('sacoMeasure')
 
+class fNameX(dict, Enum):
+    input:dict =     {'pathObjX':None,'pathStrX':'','nameX': 'input'}
+    processed:dict = {'pathObjX':None,'pathStrX':'','nameX': 'processed',}
+    output:dict =    {'pathObjX':None,'pathStrX':'','nameX': 'output'}
+    modelAI:dict =   {'pathObjX':None,'pathStrX':'','nameX': 'modelAI'}
 
-DECADE_MODEL='best_y11Lseg.pt'
-# yolo_model = YOLO('car_plate.pt')
-# yolo_model = YOLO('best.pt')
-yolo_model = YOLO(DECADE_MODEL)
+# Path_X=dict()
+# for f in [e.value for e in fNameX]:
+for f in fNameX:
+    f['pathObjX'] = home.joinpath( f['nameX'] )
+    f['pathStrX'] = home.joinpath(f['nameX']).absolute().as_posix()
+    if not os.path.exists(f['pathStrX']):
+        os.makedirs(f['pathStrX'])
+    print('[O][working-folder][init]', f['pathStrX'])
 
-extension = '.jpg'
+DECADE_MODEL_PATH=fNameX.modelAI['pathObjX'].joinpath(DECADE_MODEL)
 
-att_dir_input = 'input'
-att_dir_processed = 'processed'
-att_dir_output = 'output'
+# print('[][][]',list(map(dict, fNameX)))
+if not os.path.exists(DECADE_MODEL_PATH):
+    print('[X][model_ai][load-not-found]',DECADE_MODEL_PATH)
+    exit(0)
+else:
+    print('[OK][model_ai][load]', DECADE_MODEL_PATH)
 
-att_dir_input_Path = Path(att_dir_input)
-att_dir_processed_Path= Path(att_dir_processed)
-att_dir_output_Path= Path(att_dir_output)
+yolo_model = YOLO(fNameX.modelAI['pathObjX'].joinpath(DECADE_MODEL))
+for each_file in fNameX.input['pathObjX'].glob('*.*'): # grabs all files
+    each_file.rename(fNameX.output['pathObjX'].joinpath(each_file.name)) # moves to parent folder.
 
-if not os.path.exists(att_dir_processed):
-    os.makedirs(att_dir_processed)
-if not os.path.exists(att_dir_input):
-    os.makedirs(att_dir_input)
-if not os.path.exists(att_dir_output):
-    os.makedirs(att_dir_output)
-# shutil.move(att_dir_input+os.sep+'*', att_dir_output)
-
-for each_file in att_dir_input_Path.glob('*.*'): # grabs all files
-     # gets the parent of the folder
-    each_file.rename(att_dir_output_Path.joinpath(each_file.name)) # moves to parent folder.
 def directory_modified(dir_path, poll_timeout=1):
     init_mtime = os.stat(dir_path).st_mtime
     while True:
         now_mtime = os.stat(dir_path).st_mtime
         if init_mtime != now_mtime:
             init_mtime = now_mtime
-            print(datetime.datetime.now(),"[1][decade.tw][monitor][different]input=",att_dir_input,", output=",att_dir_output)
+            print(datetime.datetime.now(),"[1][decade.tw][monitor][different]input=",fNameX.input,", output=",fNameX.output)
             allImages = []
             for ext in ('*.gif', '*.png', '*.jpg','*.tif'):
-                allImages.extend(glob.glob(att_dir_input+os.sep+ ext))
+                allImages.extend(glob.glob(fNameX.input['pathStrX']+os.sep+ ext))
             # allImages=glob.glob(att_dir_input+os.sep+'*.jpg')
             print(datetime.datetime.now(), "[2][decade.tw][monitor][different]allImages=", allImages)
             # yolo_decade(None,None,allImages)
-            for imagePathX in allImages:
-                # step1_rawImageX=cv2.imread(imagePathX)
-                yolo_decade(None,imagePathX)
-                # os.remove(imagePathX)
+            for imagepathObjX in allImages:
+                # step1_rawImageX=cv2.imread(imagepathObjX)
+                yolo_decade(None,imagepathObjX)
+                # os.remove(imagepathObjX)
         else:
-            print(datetime.datetime.now(),"[3][decade.tw][monitor][same]input=",att_dir_input)
+            print(datetime.datetime.now(),"[3][decade.tw][monitor][same]input=",fNameX.input)
         time.sleep(poll_timeout)
 
 def thread_safe_predict(yolo_model, image_path):
@@ -69,8 +72,9 @@ def thread_safe_predict(yolo_model, image_path):
         probs = result.probs  # Probs object for classification outputs
         obb = result.obb  # Oriented boxes object for OBB outputs
         # result.show()  # display to screen
-        result.save(filename=att_dir_processed_Path.joinpath('result_' + Path(image_path).name))
-        Path(image_path).rename(att_dir_processed_Path.joinpath(Path(image_path).name))
+        result.save(filename=fNameX.processed['pathObjX'].joinpath( Path(image_path).name+'.AI' + Path(image_path).suffix ))
+
+        Path(image_path).rename(fNameX.processed['pathObjX'].joinpath(Path(image_path).name))
 
         for index in range(len(masks)):
             img = np.copy(result.orig_img)
@@ -79,7 +83,7 @@ def thread_safe_predict(yolo_model, image_path):
             cv2.drawContours(b_mask, [contour], -1, (255, 255, 255), cv2.FILLED)
             mask3ch = cv2.cvtColor(b_mask, cv2.COLOR_GRAY2BGR)
             isolated = cv2.bitwise_and(mask3ch, img)
-            cv2.imwrite(att_dir_output_Path.joinpath('isolated_'+str(index)+'_' + Path(image_path).name).absolute().as_posix(), isolated)
+            cv2.imwrite(fNameX.output['pathObjX'].joinpath(Path(image_path).name+'.ISO.'+str(index)+'' + Path(image_path).suffix).absolute().as_posix(), isolated)
 
 def yolo_decade(raw=None,imagePath=None,allImages=None):
     resultFinal=[]
@@ -128,7 +132,7 @@ def yolo_decade(raw=None,imagePath=None,allImages=None):
 
     return resultFinal
 
-directory_modified(att_dir_input, 5)
+directory_modified(fNameX.input['pathStrX'], 5)
 
 #pip install ultralytics
 # yolo predict model=car_plate.pt source='input/wt1.png'

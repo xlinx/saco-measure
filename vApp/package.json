@@ -12,6 +12,7 @@
   "dependencies": {
     "antd": "latest",
     "antd-mobile-icons": "latest",
+    "antd-style": "^3.7.1",
     "inferencejs": "^1.0.16",
     "react": "^19.0.0",
     "react-bootstrap-icons": "^1.11.5",

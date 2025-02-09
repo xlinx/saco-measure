@@ -188,7 +188,7 @@ function App() {
         >
             <Layout
                 style={{
-                    //     // borderRadius: 18,
+                    width:'100vw',
                     //     // overflow: 'hidden',
                     //      width: 'calc(100% )',
                     //     // height: 'calc(100% )',
@@ -208,8 +208,8 @@ function App() {
                 </Header>
                 <Content id="app_content" style={{
                     // top: '48px',
-                    height: '100vh',
                     // height: '100vh',
+                    // width: '100vw',
                     position: 'relative'
                     // textAlign: 'center',
                     // minHeight: '100%',
@@ -218,8 +218,8 @@ function App() {
                     // color: '#fff',
                     // backgroundColor: '#eee',
                 }}>
-
-                    <BoardX InitPageID={InitPageID} />
+aaa
+                    {/*<BoardX InitPageID={InitPageID} />*/}
                 </Content>
                 {/*<Footer >*/}
                 <Tabs
