@@ -136,3 +136,6 @@ directory_modified(fNameX.input['pathStrX'], 5)
 
 #pip install ultralytics
 # yolo predict model=car_plate.pt source='input/wt1.png'
+#pyinstaller -F sacoMain.py
+# pyinstaller -D sacoMain.py
+#pip install pyinstaller
