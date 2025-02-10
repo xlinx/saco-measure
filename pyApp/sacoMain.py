@@ -1,4 +1,5 @@
 import os
+import threading
 import time
 from enum import Enum
 from pathlib import Path
@@ -9,6 +10,9 @@ import cv2
 import numpy as np
 
 from ultralytics import YOLO
+
+from SotaTool_decade_tw import run_sota
+
 # from shapely.geometry import Polygon
 DECADE_MODEL='best.pt'
 home = Path.home().joinpath('sacoMeasure')
@@ -18,6 +22,8 @@ class fNameX(dict, Enum):
     processed:dict = {'pathObjX':None,'pathStrX':'','nameX': 'processed',}
     output:dict =    {'pathObjX':None,'pathStrX':'','nameX': 'output'}
     modelAI:dict =   {'pathObjX':None,'pathStrX':'','nameX': 'modelAI'}
+    sota: dict     = {'pathObjX': None, 'pathStrX': '', 'nameX': 'sota'}
+
 
 # Path_X=dict()
 # for f in [e.value for e in fNameX]:
@@ -90,49 +96,17 @@ def yolo_decade(raw=None,imagePath=None,allImages=None):
     # yolo_results=yolo_model(imagePath,  classes=[2,3])
     if allImages is None:
         # yolo_results = yolo_model(imagePath,classes=0)
-        Thread(target=thread_safe_predict, args=(yolo_model, imagePath)).start()
+        threadX=threading.Thread(target=thread_safe_predict, args=(yolo_model, imagePath))
+        threadX.start()
+        threadX.join()
+        run_sota(fNameX.output['pathStrX'],fNameX.sota['pathStrX'])
     else:
         yolo_results = yolo_model(allImages)
-    # print(datetime.datetime.now(), "[1][yolo_decade]",
-    #       # yolo_results[0].names,
-    #       yolo_results[0].boxes.cls,
-    #       # yolo_results[0].boxes.data,
-    #       "[1][yolo_decade]conf=",yolo_results[0].boxes.conf,
-    #       yolo_results[0].boxes.xywh,
-    #       # yolo_results[0].plot()
-    #       )
-    # boxes = yolo_results[0].boxes.xyxy
-
-    # for index,box in enumerate(boxes):
-    #     # if yolo_results[0].boxes.conf[index] <0.8:
-    #     #     continue
-    #
-    #     # box=box.cpu().numpy()
-    #     x1 = int(box[0])
-    #     y1 = int(box[1])
-    #     x2 = int(box[2])
-    #     y2 = int(box[3])
-    #     cv2.rectangle(raw, (x1, y1), (x2, y2), (0, 255, 0), 2)
-    #     tmp = cv2.cvtColor(raw[y1:y2, x1:x2].copy(), cv2.COLOR_RGB2GRAY)
-    #
-    #     # img = text(raw, license, (x1, y1 - 20), (0, 255, 0), 25)
-    #     plt.imshow(tmp)
-    #     plt.title("yolo_plate_decade")
-    #     plt.show()
-    # # plt.subplot(2,3,i+1)
-    # # plt.axis("off")
-    # # plt.imshow(raw)
-    # # for result in yolo_results:
-    # #     result.show()
-    # # annotated_frame=result[0].plot
-    # # cv2.imshow("yolo_decade",annotated_frame)
-    # plt.imshow(X=yolo_results[0].plot()[:,:,::-1])
-    # plt.title("yolo_decade")
-    # plt.show()
 
     return resultFinal
 
 directory_modified(fNameX.input['pathStrX'], 5)
+# run_sota(fNameX.output['pathStrX'], fNameX.sota['pathStrX'])
 
 #pip install ultralytics
 # yolo predict model=car_plate.pt source='input/wt1.png'

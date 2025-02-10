@@ -307,7 +307,7 @@ else:
 
 x = np.arange(1, prompt, 1)
 x = x * (1 / voxel)
-x_new = np.linspace((1 / voxel), max(x), prompt * 100)
+x_new = np.linspace((1 / voxel), x, prompt * 100)
 distances = [*range(1, prompt, 1)]
 distances2 = [*range(0, prompt - 1, 1)]
 angles = [*range(1, 181, 1)]
