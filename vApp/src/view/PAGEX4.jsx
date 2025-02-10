@@ -16,7 +16,7 @@ const StaticHTML = () => {
     const [showHighlight, setShowHighlight] = useState(false)
     useEffect(() => {
         setShowHighlight(!showHighlight)
-    }, [showHighlight])
+    }, [])
 
     return (
         <>
@@ -34,7 +34,7 @@ const StaticHTML = () => {
                     <Flex gap="middle" align="center" justify="center" vertical>
                         <Card className="cardContent" title={`saco-Measure`}
                               bordered={true}>
-                           <>AAA</>
+                           <>p4</>
                         </Card>
                         <Footer className="contentFooter">
                             saco-Measure | 2025

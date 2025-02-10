@@ -12,7 +12,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         {/*<ConfigProvider locale={enUS}>*/}
         {/*<App />*/}
         <Routes>
-            <Route path='/' element={<OnePage/>}/>
+            <Route path='/' element={<App/>}/>
             <Route path='/app' element={<App/>}/>
             <Route path='/liff' element={<App/>}/>
             <Route path='/notfound' element={<App/>}/>
