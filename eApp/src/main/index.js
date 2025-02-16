@@ -2,8 +2,29 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { join } from 'path'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import * as fs from "node:fs";
+// require('@electron/remote/main').initialize()
 
-require('@electron/remote/main').initialize()
+let TX_JSON={}
+const path = require('path');
+const homedir = require("os").homedir();
+const dirTree = require("directory-tree");
+
+
+
+const callback_dirTree = (
+  item,
+  path
+) => {
+  item.isDirectory = fs.lstatSync(path).isDirectory();
+};
+const dirTree_SacoMeasure = dirTree(path.join(homedir,'sacoMeasure'),
+  { extensions: /\.(jpg|tif|png|jpeg|tiff|JPG|TIF|TIFF|PNG|JPEG)$/ }, (item, PATH, stats) => {
+  // console.log("[][][pathSacoMeasure]", item);
+},callback_dirTree);
+console.log("[][1][pathSacoMeasure]", dirTree_SacoMeasure);
+
+
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -24,13 +45,14 @@ function createWindow() {
   })
 
   mainWindow.on('ready-to-show', () => {
+    mainWindow.maximize()
     mainWindow.show()
   })
   mainWindow.webContents.openDevTools()
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
-    return { action: 'deny' }
+    return { action: 'deny' ,fileTree:dirTree_SacoMeasure }
   })
 
   // HMR for renderer base on electron-vite cli.
@@ -40,6 +62,7 @@ function createWindow() {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
 }
 
 // This method will be called when Electron has finished
@@ -47,7 +70,7 @@ function createWindow() {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('tw.decade.sacoMeasure')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -56,12 +79,16 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
   function wait(milliseconds) {
-    return new Promise((resolve) => setTimeout(resolve, 2000))
+    return new Promise((resolve) => setTimeout(resolve, 0))
   }
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
   ipcMain.handle('toMain', async (event, ...args) => {
-    return await wait(...args)
+    TX_JSON['TS']=new Date().toLocaleString()
+    TX_JSON['dirTree_SacoMeasure']=dirTree_SacoMeasure
+    TX_JSON['RX_JSON']=[...args]
+    console.log('[fromIpcRender]@[ipcMain.handle][main][handle]TX_JSON=', TX_JSON)
+    return (TX_JSON)
   })
   createWindow()
 
@@ -69,6 +96,7 @@ app.whenReady().then(() => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
+
   })
 })
 

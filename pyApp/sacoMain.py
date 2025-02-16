@@ -184,7 +184,10 @@ def run_sota(ALL_VAR):
         files = glob.glob(os.path.join(input_dir , "*.tif"))
 
     # Analysis GLCM and sarcomere length, loop over folder
-    for img in tqdm(files):
+    pbar = tqdm(files)
+    for img in pbar:
+        pbar.set_description('[d][decade.tw][files]%s' % img)
+
         image = cv2.imread(img)
         # image_ID = '/' + img[folderLen:].replace('.tif', '').replace('\\', '').replace('/segments', '')
         image_ID = Path(img).name.split('.')[0]
@@ -365,7 +368,7 @@ def yolo_decade(raw=None,imagePath=None,allImages=None):
 
 
 
-# directory_modified(fNameX.input['pathStrX'], 5)
+directory_modified(fNameX.input['pathStrX'], 5)
 Thread(target=run_sota, args=[SOTA_ALL_VAR] ).start()
 # run_sota(fNameX.output['pathStrX'], fNameX.sota['pathStrX'])
 

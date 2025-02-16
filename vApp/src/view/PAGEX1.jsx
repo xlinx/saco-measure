@@ -29,6 +29,7 @@ import {AppOutline, StarFill, UnorderedListOutline,} from "antd-mobile-icons";
 import {MenuUnfoldOutlined,AudioOutlined} from "@ant-design/icons";
 // import Marquee from "react-fast-marquee";
 import {UploadX} from "./UploadX.jsx";
+import GalleryX from "./GalleryX.jsx";
 
 
 
@@ -119,12 +120,13 @@ const StaticHTML = () => {
                                 />}
                                 onSearch={
                                     (val) => {
+                                        console.log('[][P1][onSearch]val=', val)
                                         // let indexMain=new remote.BrowserWindow({width:200})
                                         // indexMain.loadURL('http://localhost:3000/#/tab1')
                                         window.electron?.ipcRenderer.invoke('toMain',
                                             { case: 'handleFileOpen',value: val}).then(
                                             (r) => {
-                                                console.log('[][P4][invoke]r=', r)
+                                                console.log('[][P1][invoke][then]r=', r)
                                             }
                                         )
                                     }
@@ -141,6 +143,8 @@ const StaticHTML = () => {
                         <Slider marks={marks} included={false} defaultValue={75} />
                         <Divider style={{borderColor: '#333'}} orientation="center" >Model Status</Divider>
                     </Card>
+                    <Divider style={{borderColor: '#7cb305'}} >Input</Divider>
+                        <GalleryX/>
                     <Divider style={{borderColor: '#7cb305'}} >WorkingPanel</Divider>
                     <Space direction="vertical" size={16}>
                         <Card hoverable title="Input">
