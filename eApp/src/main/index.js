@@ -1,13 +1,16 @@
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
-import { join } from 'path'
-import { electronApp, is, optimizer } from '@electron-toolkit/utils'
+import {app, BrowserWindow, ipcMain, shell} from 'electron'
+import {join} from 'path'
+import {electronApp, is, optimizer} from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import * as fs from "node:fs";
+import {initServer} from "./proxyX";
 // require('@electron/remote/main').initialize()
+// import {open, close} from 'node:fs';
 
-let TX_JSON={}
+let TX_JSON = {}
 const path = require('path');
 const homedir = require("os").homedir();
+let homedir_sacoMeasure = path.join(homedir, 'sacoMeasure');
 const dirTree = require("directory-tree");
 
 
@@ -18,21 +21,22 @@ const callback_dirTree = (
 ) => {
   item.isDirectory = fs.lstatSync(path).isDirectory();
 };
-const dirTree_SacoMeasure = dirTree(path.join(homedir,'sacoMeasure'),
-  { extensions: /\.(jpg|tif|png|jpeg|tiff|JPG|TIF|TIFF|PNG|JPEG)$/ }, (item, PATH, stats) => {
-  // console.log("[][][pathSacoMeasure]", item);
-},callback_dirTree);
-console.log("[][1][pathSacoMeasure]", dirTree_SacoMeasure);
+const dirTree_SacoMeasure = dirTree(path.join(homedir, 'sacoMeasure'),
+  {extensions: /\.(jpg|tif|png|jpeg|tiff|JPG|TIF|TIFF|PNG|JPEG)$/}, (item, PATH, stats) => {
+    // console.log("[][][pathSacoMeasure]", item);
+  }, callback_dirTree);
+// console.log("[][1][pathSacoMeasure]", dirTree_SacoMeasure);
 
 
 function createWindow() {
   // Create the browser window.
+  initServer()
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    ...(process.platform === 'linux' ? {icon} : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
@@ -52,7 +56,7 @@ function createWindow() {
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
-    return { action: 'deny' ,fileTree:dirTree_SacoMeasure }
+    return {action: 'deny', fileTree: dirTree_SacoMeasure}
   })
 
   // HMR for renderer base on electron-vite cli.
@@ -78,15 +82,17 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
+
   function wait(milliseconds) {
     return new Promise((resolve) => setTimeout(resolve, 0))
   }
+
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
   ipcMain.handle('toMain', async (event, ...args) => {
-    TX_JSON['TS']=new Date().toLocaleString()
-    TX_JSON['dirTree_SacoMeasure']=dirTree_SacoMeasure
-    TX_JSON['RX_JSON']=[...args]
+    TX_JSON['TS'] = new Date().toLocaleString()
+    TX_JSON['dirTree_SacoMeasure'] = dirTree_SacoMeasure
+    TX_JSON['RX_JSON'] = [...args]
     console.log('[fromIpcRender]@[ipcMain.handle][main][handle]TX_JSON=', TX_JSON)
     return (TX_JSON)
   })
@@ -108,6 +114,8 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
+
+
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.

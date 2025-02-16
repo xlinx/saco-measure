@@ -1,19 +1,78 @@
 import os from 'node:os'
 import express from "express";
 import {createProxyMiddleware} from 'http-proxy-middleware';
+import path from "path";
+import fs from "node:fs";
 const app = express();
+const homedir = require("os").homedir();
+let homedir_sacoMeasure = path.join(homedir, 'sacoMeasure');
+
+let http = require("http")
+const urlX = require("url");
+
+function httpHandler(req, res){
+  // console.log('req=',req,`${req.method} ${req.url}`);
+  req.url=req.url.replaceAll("/ftp",'')
+  const parsedUrl = urlX.parse(req.url);
+  const sanitizePath = path.normalize(parsedUrl.pathname).replace(/^(\.\.[\/\\])+/, '');
+  let pathname = path.join(homedir_sacoMeasure, sanitizePath);
+
+
+  fs.open(pathname, 'r', (err, fd) => {
+    if (err) {
+      if (err.code === 'ENOENT') {
+        console.error('myfile does not exist');
+        res.statusCode = 404;
+        res.end(`File ${pathname} not found!`);
+        return;
+      }
+      throw err;
+    }
+    try {
+      if (fs.statSync(pathname).isDirectory()) {
+        pathname += '/index.html';
+      }
+      fs.readFile(pathname, function (err, data) {
+        console.log(`[][][fs.readFile]`);
+
+        if (err) {
+          res.statusCode = 500;
+          res.end(`Error getting the file: ${err}.`);
+        } else {
+          const ext = path.parse(pathname).ext;
+          res.setHeader('Content-type', mimeType[ext] || 'text/plain');
+          res.end(data);
+        }
+      });
+    } finally {
+      fs.close(fd, (err) => {
+        if (err) throw err;
+      });
+    }
+  });
+}
+
+
+
+
+
 async function initProxyServer(PORT_ProxyServer) {
 
   return new Promise((resolve, reject) => {
     try {
-      app.use('/gallery', require('../lib/gallery.js')({
-        staticFiles : 'resources/photos',
-        urlRoot : 'gallery',
-        title : 'Example Gallery',
-        render : false //
-      }), function(req, res, next){
-        return res.render('gallery', { galleryHtml : req.html });
+      app.use('/ftp', function(req, res, next){
+        httpHandler(req, res);
+        // next();
       });
+
+      // app.use('/gallery', require('../lib/gallery.js')({
+      //   staticFiles : 'resources/photos',
+      //   urlRoot : 'gallery',
+      //   title : 'Example Gallery',
+      //   render : false //
+      // }), function(req, res, next){
+      //   return res.render('gallery', { galleryHtml : req.html });
+      // });
 
       app.use('/magic',
         createProxyMiddleware({
@@ -53,6 +112,26 @@ async function initProxyServer(PORT_ProxyServer) {
     }
   });
 }
+
+const mimeType = {
+  '.ico': 'image/x-icon',
+  '.html': 'text/html',
+  '.js': 'text/javascript',
+  '.json': 'application/json',
+  '.css': 'text/css',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.tif': 'image/tif',
+  '.wav': 'audio/wav',
+  '.mp3': 'audio/mpeg',
+  '.svg': 'image/svg+xml',
+  '.pdf': 'application/pdf',
+  '.zip': 'application/zip',
+  '.doc': 'application/msword',
+  '.eot': 'application/vnd.ms-fontobject',
+  '.ttf': 'application/x-font-ttf',
+};
+
 function timerX() {
   // setInterval(() => {
   // console.log(new Date(),'[][timerX][1000][]')
@@ -71,6 +150,12 @@ export function initServer() {
     console.log('[ProxyJS][IN-Call][initServer]has been loaded')
     return
   }
+  const httpServer_nodejs = http.createServer(
+    (req, res) =>{httpHandler(req, res)
+      console.log(`[][][-DECADEHTTP-NODE-Module]Server listening on port 7777`);
+
+    } ).listen(7777);
+
   initProxyServer(3128).then(r => {
     console.log('[][][DECADE-PROXY-Module][3]server listening ', 3128);
   });console.log(`[][][initServer][1]...startLoading`)
@@ -87,7 +172,7 @@ else {
   console.log('[ProxyJS][base-Call][initServer]start loading')
   initServer()
 }
-console.log('[ProxyJS][2][initServer]', useStoreS)
+// console.log('[ProxyJS][2][initServer]', useStoreS)
 // export default initServer
 export let useStoreS = {
   BOX_IP: '192.168.88.154',
