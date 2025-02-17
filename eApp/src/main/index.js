@@ -16,7 +16,7 @@ const dirTree = require("directory-tree");
 
 
 const callback_dirTree = (item, PATH) => {
-  console.log('[][][1]callback_dirTree item, nodePath=',item, PATH)
+  // console.log('[][][1]callback_dirTree item, nodePath=',item, PATH)
   item.children.map((e)=>{
     e.isDirectory = fs.lstatSync(e.path).isDirectory();
     e.thumbnail=e.path.replaceAll(homedir_sacoMeasure,'http://localhost:3128/ftp')
@@ -24,7 +24,7 @@ const callback_dirTree = (item, PATH) => {
     e.id=e.path
   })
 
-  console.log('[][][2]callback_dirTree item, nodePath=',item, PATH)
+  // console.log('[][][2]callback_dirTree item, nodePath=',item, PATH)
 
 };
 let dirTree_SacoMeasure = dirTree(homedir_sacoMeasure,
@@ -95,19 +95,19 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
-  ipcMain.handle('toMain', async (event, ...args) => {
+  ipcMain.handle('toMain', async (event, args) => {
     TX_JSON['TS'] = new Date().toLocaleString()
+    console.log('[][][11]new_path',homedir_sacoMeasure, args)
+    let new_path=(nodePath.join(homedir_sacoMeasure, args.targetFolder))
+    // let new_path='/Users/xlinx/sacoMeasure/processed'
 
-    // let new_path=nodePath.normalize(nodePath.join(homedir_sacoMeasure.toString(), args.targetFolder))
-    let new_path='/Users/xlinx/sacoMeasure/processed'
-    console.log('new_path',new_path)
     // let new_path='/Users/xlinx/sacoMeasure/processed'
     TX_JSON['dirTree_SacoMeasure'] = dirTree(new_path,
       {extensions: /\.(jpg|tif|png|jpeg|tiff|JPG|TIF|TIFF|PNG|JPEG)$/}, (item, PATH, stats) => {
         // console.log("[][][pathSacoMeasure]", item);
       }, callback_dirTree)
-    TX_JSON['RX_JSON'] = [...args]
-    console.log('[fromIpcRender]@[ipcMain.handle][main][handle]TX_JSON=', TX_JSON)
+    TX_JSON['RX_JSON'] = args
+    // console.log('[fromIpcRender]@[ipcMain.handle][main][handle]TX_JSON=', TX_JSON)
     return (TX_JSON)
   })
   createWindow()

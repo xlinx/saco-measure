@@ -14,17 +14,18 @@ const url = require('node:url');
 const ip=require('ip')
 
 function httpHandler(req, res){
-  console.log('[][][httpHandler]req=',`${req.method} ${req.url}`);
+  // console.log('[][][httpHandler]req=',`${req.method} ${req.url}`);
 
   const parsedUrl = new url.URL(req.url,'http://'+ip.address()+':3128/ftp');
   const sanitizePath =(parsedUrl.pathname).replace(/^(\.\.[\/\\])+/, '');
   let pathname = path.join(homedir_sacoMeasure, sanitizePath);
-
+  pathname=decodeURI(pathname)
+  console.log('[][][httpHandler]pathname=',pathname);
 
   fs.open(pathname, 'r', (err, fd) => {
     if (err) {
       if (err.code === 'ENOENT') {
-        console.error('myfile does not exist');
+        console.error('myfile does not exist',pathname);
         res.statusCode = 404;
         res.end(`File ${pathname} not found!`);
         return;
@@ -36,7 +37,7 @@ function httpHandler(req, res){
         pathname += '/index.html';
       }
       fs.readFile(pathname, function (err, data) {
-        console.log(`[][][fs.readFile]`);
+        // console.log(`[][][fs.readFile]`);
 
         if (err) {
           res.statusCode = 500;
@@ -141,10 +142,10 @@ function timerX() {
   // LoadXhtml();
   // wssBroadcast1000();//unicast it
   // }, 500);
-  setInterval(() => {
-    console.log(new Date(), '[][timerX][1000][]')
-  }, 1000)
-  setInterval(() => {}, 3000)
+  // setInterval(() => {
+    // console.log(new Date(), '[][timerX][1000][]')
+  // }, 1000)
+  // setInterval(() => {}, 3000)
 }
 let lLOADED = false
 

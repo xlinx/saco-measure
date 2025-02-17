@@ -144,7 +144,13 @@ const StaticHTML = () => {
                         <Divider style={{borderColor: '#333'}} orientation="center" >Model Status</Divider>
                     </Card>
                     <Divider style={{borderColor: '#7cb305'}} >Input</Divider>
-                        <GalleryX/>
+                        <GalleryX folderName={'input'}/>
+                    <Divider style={{borderColor: '#7cb305'}} >output</Divider>
+                      <GalleryX folderName={'output'}/>
+                    <Divider style={{borderColor: '#7cb305'}} >processed</Divider>
+                      <GalleryX folderName={'processed'}/>
+                    <Divider style={{borderColor: '#7cb305'}} >sota</Divider>
+                      <GalleryX folderName={'sota'}/>
                     <Divider style={{borderColor: '#7cb305'}} >WorkingPanel</Divider>
                     <Space direction="vertical" size={16}>
                         <Card hoverable title="Input">

@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {Card, Divider, Image, Input, List, Space, Typography} from 'antd';
 const nodePath = require('path');
 
-export function GalleryX() {
+export function GalleryX(props) {
     const [searchText, setSearchText] = useState('');
     const [loading, setLoading] = useState(false);
     const [dataSource, setDataSource] = useState([]);
@@ -12,7 +12,7 @@ export function GalleryX() {
     useEffect(() => {
         const intervalId = setInterval(() => {  //assign interval to a variable to clear it.
             window.electron?.ipcRenderer.invoke('toMain',
-                { WHO:'GalleryX',targetFolder:'processed'}).then(
+                { WHO2:'GalleryX',targetFolder:props.folderName}).then(
                 (r) => {
                     console.log('[][GalleryX][invoke][then]r=', r)
                     // setFiles(r.dirTree_SacoMeasure)
