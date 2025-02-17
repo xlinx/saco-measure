@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
 import {Card, Divider, Image, Input, List, Space, Typography} from 'antd';
+const nodePath = require('path');
 
 export function GalleryX() {
     const [searchText, setSearchText] = useState('');
@@ -9,14 +10,31 @@ export function GalleryX() {
     const [previewImages, setPreviewImages] = useState([]);
 
     useEffect(() => {
-        setLoading(true);
-        fetch(`https://dummyjson.com/products/search?q=${searchText}`)
-            .then(res => res.json())
-            .then(res => {
-                setDataSource(res.products);
-                setLoading(false);
-            });
-    }, [searchText]);
+        const intervalId = setInterval(() => {  //assign interval to a variable to clear it.
+            window.electron?.ipcRenderer.invoke('toMain',
+                { WHO:'GalleryX',targetFolder:'processed'}).then(
+                (r) => {
+                    console.log('[][GalleryX][invoke][then]r=', r)
+                    // setFiles(r.dirTree_SacoMeasure)
+                    setDataSource(r.dirTree_SacoMeasure.children);
+                    setLoading(false);
+                }
+            )
+
+        }, 1000)
+
+        return () => clearInterval(intervalId); //This is important
+
+    }, [ ])
+    // useEffect(() => {
+    //     setLoading(true);
+    //     fetch(`https://dummyjson.com/products/search?q=${searchText}`)
+    //         .then(res => res.json())
+    //         .then(res => {
+    //             setDataSource(res.products);
+    //             setLoading(false);
+    //         });
+    // }, [searchText]);
 
     return (
         <div>
@@ -38,12 +56,15 @@ export function GalleryX() {
                     renderItem={(item) => {
                         return <Card
                             key={item.id}
+                            title={nodePath.basename(item.id)}
                             style={{margin: 12}}
                             hoverable
                         >
-                            <Image src={item.thumbnail} preview={false} onClick={() => {
-                                setPreviewImages(item.images)
-                            }}/>
+                            <Image src={item.thumbnail}
+                                   // preview={false} onClick={() => {
+                                   //  setPreviewImages(item.images)
+                                   //  }}
+                            />
                         </Card>
                     }} />
                 {

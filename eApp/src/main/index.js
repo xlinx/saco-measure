@@ -8,20 +8,26 @@ import {initServer} from "./proxyX";
 // import {open, close} from 'node:fs';
 
 let TX_JSON = {}
-const path = require('path');
+const nodePath = require('path');
 const homedir = require("os").homedir();
-let homedir_sacoMeasure = path.join(homedir, 'sacoMeasure');
+const homedir_sacoMeasure = nodePath.join(homedir, 'sacoMeasure');
 const dirTree = require("directory-tree");
 
 
 
-const callback_dirTree = (
-  item,
-  path
-) => {
-  item.isDirectory = fs.lstatSync(path).isDirectory();
+const callback_dirTree = (item, PATH) => {
+  console.log('[][][1]callback_dirTree item, nodePath=',item, PATH)
+  item.children.map((e)=>{
+    e.isDirectory = fs.lstatSync(e.path).isDirectory();
+    e.thumbnail=e.path.replaceAll(homedir_sacoMeasure,'http://localhost:3128/ftp')
+    e.image=e.path.replaceAll(homedir_sacoMeasure,'http://localhost:3128/ftp')
+    e.id=e.path
+  })
+
+  console.log('[][][2]callback_dirTree item, nodePath=',item, PATH)
+
 };
-const dirTree_SacoMeasure = dirTree(path.join(homedir, 'sacoMeasure'),
+let dirTree_SacoMeasure = dirTree(homedir_sacoMeasure,
   {extensions: /\.(jpg|tif|png|jpeg|tiff|JPG|TIF|TIFF|PNG|JPEG)$/}, (item, PATH, stats) => {
     // console.log("[][][pathSacoMeasure]", item);
   }, callback_dirTree);
@@ -91,7 +97,15 @@ app.whenReady().then(() => {
   ipcMain.on('ping', () => console.log('pong'))
   ipcMain.handle('toMain', async (event, ...args) => {
     TX_JSON['TS'] = new Date().toLocaleString()
-    TX_JSON['dirTree_SacoMeasure'] = dirTree_SacoMeasure
+
+    // let new_path=nodePath.normalize(nodePath.join(homedir_sacoMeasure.toString(), args.targetFolder))
+    let new_path='/Users/xlinx/sacoMeasure/processed'
+    console.log('new_path',new_path)
+    // let new_path='/Users/xlinx/sacoMeasure/processed'
+    TX_JSON['dirTree_SacoMeasure'] = dirTree(new_path,
+      {extensions: /\.(jpg|tif|png|jpeg|tiff|JPG|TIF|TIFF|PNG|JPEG)$/}, (item, PATH, stats) => {
+        // console.log("[][][pathSacoMeasure]", item);
+      }, callback_dirTree)
     TX_JSON['RX_JSON'] = [...args]
     console.log('[fromIpcRender]@[ipcMain.handle][main][handle]TX_JSON=', TX_JSON)
     return (TX_JSON)

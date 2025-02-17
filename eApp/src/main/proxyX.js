@@ -3,18 +3,21 @@ import express from "express";
 import {createProxyMiddleware} from 'http-proxy-middleware';
 import path from "path";
 import fs from "node:fs";
+import {bindFlmngr} from "@flmngr/flmngr-server-node-express";
+
 const app = express();
 const homedir = require("os").homedir();
 let homedir_sacoMeasure = path.join(homedir, 'sacoMeasure');
 
 let http = require("http")
-const urlX = require("url");
+const url = require('node:url');
+const ip=require('ip')
 
 function httpHandler(req, res){
-  // console.log('req=',req,`${req.method} ${req.url}`);
-  req.url=req.url.replaceAll("/ftp",'')
-  const parsedUrl = urlX.parse(req.url);
-  const sanitizePath = path.normalize(parsedUrl.pathname).replace(/^(\.\.[\/\\])+/, '');
+  console.log('[][][httpHandler]req=',`${req.method} ${req.url}`);
+
+  const parsedUrl = new url.URL(req.url,'http://'+ip.address()+':3128/ftp');
+  const sanitizePath =(parsedUrl.pathname).replace(/^(\.\.[\/\\])+/, '');
   let pathname = path.join(homedir_sacoMeasure, sanitizePath);
 
 
@@ -64,15 +67,14 @@ async function initProxyServer(PORT_ProxyServer) {
         httpHandler(req, res);
         // next();
       });
+      bindFlmngr({
+        app: app,
+        apiKey: "FLMN24RR1234123412341234",
+        urlFileManager: "/fm",
+        urlFiles: "/ftp/",
+        dirFiles: homedir_sacoMeasure
+      });
 
-      // app.use('/gallery', require('../lib/gallery.js')({
-      //   staticFiles : 'resources/photos',
-      //   urlRoot : 'gallery',
-      //   title : 'Example Gallery',
-      //   render : false //
-      // }), function(req, res, next){
-      //   return res.render('gallery', { galleryHtml : req.html });
-      // });
 
       app.use('/magic',
         createProxyMiddleware({
@@ -122,6 +124,7 @@ const mimeType = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.tif': 'image/tif',
+  '.tiff': 'image/tiff',
   '.wav': 'audio/wav',
   '.mp3': 'audio/mpeg',
   '.svg': 'image/svg+xml',

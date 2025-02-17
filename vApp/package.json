@@ -11,9 +11,9 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.6.1",
-    "@cubone/react-file-manager": "^1.20.0",
-    "@electron/remote": "^2.1.2",
 
+    "@electron/remote": "^2.1.2",
+    "@flmngr/flmngr-react": "^2.0.4",
     "antd": "latest",
     "antd-mobile-icons": "latest",
     "antd-style": "^3.7.1",
