@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from 'react';
 
 import {Card, Divider, Image, Input, List, Space, Typography} from 'antd';
-const nodePath = require('path');
+import {UploadX} from "./UploadX.jsx";
+
+import * as path from "path";
 
 export function GalleryX(props) {
     const [searchText, setSearchText] = useState('');
@@ -38,17 +40,17 @@ export function GalleryX(props) {
 
     return (
         <div>
-            <Divider style={{borderColor: '#7cb305'}} >
-                <Input.Search style={{width: '100%', maxWidth: 500}} placeholder='Search products' onSearch={(value) => setSearchText(value)} />
-            </Divider>
+            {/*<Divider style={{borderColor: '#7cb305'}} >*/}
+            {/*    <Input.Search style={{width: '100%', maxWidth: 500}} placeholder='Search products' onSearch={(value) => setSearchText(value)} />*/}
+            {/*</Divider>*/}
 
             <Space
-                direction='vertical'
+                direction='horizontal'
             >
                 {/*<Typography.Title>Image Gallery</Typography.Title>*/}
                 {/*<Typography.Text>Showing products searchd by: {searchText || 'All'} </Typography.Text>*/}
 
-
+                {props.upload === true ? <UploadX></UploadX> : null}
                 <List
                     loading={loading}
                     dataSource={dataSource}
@@ -56,7 +58,7 @@ export function GalleryX(props) {
                     renderItem={(item) => {
                         return <Card
                             key={item.id}
-                            title={nodePath.basename(item.id)}
+                            title={path.basename(item.id)}
                             style={{margin: 12}}
                             hoverable
                         >

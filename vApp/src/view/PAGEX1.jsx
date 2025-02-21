@@ -14,7 +14,7 @@ import {
     Menu,
     theme,
     ConfigProvider,
-    Slider, Input,
+    Slider, Input, Row, Col,
 
 } from 'antd';
 import { HomeOutlined, UserOutlined } from '@ant-design/icons';
@@ -97,7 +97,7 @@ const StaticHTML = () => {
                         }}
                         // cover={<Image alt="example" src={sacoSvgLogo3} width="100px" />}
                     >
-                        <Divider style={{borderColor: '#333'}} orientation="center" >Model Setting</Divider>
+                        <Divider style={{borderColor: '#7cb305'}}  orientation="center" >Model Setting</Divider>
 
                         <Space>
                             <Radio.Group defaultValue="m" buttonStyle="solid">
@@ -141,27 +141,44 @@ const StaticHTML = () => {
                         <Slider marks={marks} included={false} defaultValue={75} />
                         <Slider marks={marks} included={false} defaultValue={75} />
                         <Slider marks={marks} included={false} defaultValue={75} />
-                        <Divider style={{borderColor: '#333'}} orientation="center" >Model Status</Divider>
                     </Card>
-                    <Divider style={{borderColor: '#7cb305'}} >Input</Divider>
-                        <GalleryX folderName={'input'}/>
-                    <Divider style={{borderColor: '#7cb305'}} >output</Divider>
-                      <GalleryX folderName={'output'}/>
-                    <Divider style={{borderColor: '#7cb305'}} >processed</Divider>
-                      <GalleryX folderName={'processed'}/>
-                    <Divider style={{borderColor: '#7cb305'}} >sota</Divider>
+                    <Divider variant="dashed" style={{ borderColor: '#333'}} orientation="center" ></Divider>
+                    <Row gutter={16}>
+                        <Col className="gutter-row" span={12}>
+                            <Card>
+                                <Divider style={{fontSize:'2em',borderColor: '#7cb305'}} >Input</Divider>
+                                {/*<UploadX/>*/}
+                                <GalleryX upload={true} folderName={'input'}/>
+                            </Card>
+                        </Col>
+                        <Col className="gutter-row" span={12}>
+                            <Card>
+                                <Divider style={{fontSize:'2em',borderColor: '#7cb305'}} >output</Divider>
+                                <GalleryX folderName={'output'}/>
+                            </Card>
+                        </Col>
+                    </Row>
+                    <Divider variant="dashed" style={{borderColor: '#333'}} orientation="center" ></Divider>
+                    <Card>
+                        <Divider style={{fontSize:'2em',borderColor: '#7cb305'}} >Processed</Divider>
+                          <GalleryX folderName={'processed'}/>
+                    </Card>
+                    <Divider variant="dashed" style={{borderColor: '#333'}} orientation="center" ></Divider>
+                    <Card>
+                    <Divider style={{fontSize:'2em',borderColor: '#7cb305'}} >SotaTool</Divider>
                       <GalleryX folderName={'sota'}/>
-                    <Divider style={{borderColor: '#7cb305'}} >WorkingPanel</Divider>
-                    <Space direction="vertical" size={16}>
-                        <Card hoverable title="Input">
+                    </Card>
+                    {/*<Divider style={{borderColor: '#7cb305'}} >WorkingPanel</Divider>*/}
+                    {/*<Space direction="vertical" size={16}>*/}
+                    {/*    <Card hoverable title="Input">*/}
 
-                            <UploadX/>
-                        </Card>
-                        <Card hoverable title="Output">
+                    {/*        <UploadX/>*/}
+                    {/*    </Card>*/}
+                    {/*    <Card hoverable title="Output">*/}
 
-                            <UploadX/>
-                        </Card>
-                    </Space>
+                    {/*        <UploadX/>*/}
+                    {/*    </Card>*/}
+                    {/*</Space>*/}
 
                 </Content>
                 <Footer

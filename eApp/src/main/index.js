@@ -97,7 +97,7 @@ app.whenReady().then(() => {
   ipcMain.on('ping', () => console.log('pong'))
   ipcMain.handle('toMain', async (event, args) => {
     TX_JSON['TS'] = new Date().toLocaleString()
-    console.log('[][][11]new_path',homedir_sacoMeasure, args)
+    // console.log('[][][11]new_path',homedir_sacoMeasure, args)
     let new_path=(nodePath.join(homedir_sacoMeasure, args.targetFolder))
     // let new_path='/Users/xlinx/sacoMeasure/processed'
 
