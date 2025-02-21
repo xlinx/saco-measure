@@ -1,8 +1,8 @@
 yolo.setup({
     modelUrl: "model/model.json",
-    labels?: ["person", "car", "dog"],
-    colors?: ["#FF0000", "#00FF00"],
-    displayLabels?: new Set(["person", "dog"]),
+    labels: ["person", "car", "dog"],
+    colors: ["#FF0000", "#00FF00"],
+    displayLabels: new Set(["person", "dog"]),
     scoreThreshold: 0.3,
     boxLineWidth: 10,
     boxLabels: true,
