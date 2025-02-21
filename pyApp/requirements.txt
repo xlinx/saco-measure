@@ -22,3 +22,6 @@ tqdm==4.62.3
 
 pipreqs==lastest
 ultralytics==8.3.74
+tensorflow==2.15.0
+tensorflow-cpu==2.15.0
+tensorflowjs==2.0.0
