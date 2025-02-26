@@ -1,4 +1,5 @@
 import os
+import shutil
 import threading
 import time
 from enum import Enum
@@ -30,7 +31,11 @@ import seaborn as sns
 import multiprocessing
 from joblib import Parallel, delayed
 
-DECADE_MODEL='best.pt'
+# DECADE_MODEL='best.pt'
+# DECADE_MODEL='best_redSeg_ultralytics.pt'
+ALL_FORMAT=('*.png', '*.jpg','*.tif')
+ALL_FORMAT_STR='*.{png,jpg,tif}'
+DECADE_MODEL='model_- 24 february 2025 4_22.pt'
 home = Path.home().joinpath('sacoMeasure')
 class fNameX(dict, Enum):
     input:dict =     {'pathObjX':None,'pathStrX':'','nameX': 'input'}
@@ -53,7 +58,7 @@ class SOTA_ALL_VAR():
     output_Interpolated_data = 0
     tilevaly:int=10
     tilevalx:int=10
-    tiling_dir:str= '/segments'
+    tiling_dir:str= ''
     # var1=background
     # var3 = skip_graph_save_time
     # var2=segments
@@ -64,7 +69,7 @@ class SOTA_ALL_VAR():
 # for f in [e.value for e in fNameX]:
 for f in fNameX:
     f['pathObjX'] = home.joinpath( f['nameX'] )
-    f['pathStrX'] = home.joinpath(f['nameX']).absolute().as_posix()
+    f['pathStrX'] = home.joinpath(f['nameX']).absolute()
     if not os.path.exists(f['pathStrX']):
         os.makedirs(f['pathStrX'])
     print('[IONIS][working-folder][init]', f['pathStrX'])
@@ -72,7 +77,7 @@ for f in fNameX:
 DECADE_MODEL_PATH=fNameX.modelAI['pathObjX'].joinpath(DECADE_MODEL)
 SOTA_ALL_VAR.inx = fNameX.output['pathStrX']
 SOTA_ALL_VAR.outx = fNameX.sota['pathStrX']
-SOTA_ALL_VAR.tiling_dir= fNameX.output['pathStrX'] + '/segments'
+SOTA_ALL_VAR.tiling_dir= fNameX.sota['pathObjX'].joinpath('segments').absolute()
 
 # print('[][][]',list(map(dict, fNameX)))
 if not os.path.exists(DECADE_MODEL_PATH):
@@ -82,6 +87,8 @@ else:
     print('[OK][model_ai][load]', DECADE_MODEL_PATH)
 
 yolo_model = YOLO(fNameX.modelAI['pathObjX'].joinpath(DECADE_MODEL))
+print('[][DECADE.TW][ML-MODEL-INFO]',yolo_model.names)
+
 for each_file in fNameX.input['pathObjX'].glob('*.*'): # grabs all files
     each_file.rename(fNameX.output['pathObjX'].joinpath(each_file.name)) # moves to parent folder.
 
@@ -100,11 +107,10 @@ def run_sota(ALL_VAR):
 
     # CoV-formula, input from user translations and output folder creation
     cv = lambda x: numpy.std(x, ddof=1) / numpy.mean(x) * 100
-    input_dir = SOTA_ALL_X.inx
-    output_dir = SOTA_ALL_X.outx
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    folderLen = len(input_dir)
+    
+    
+    if not os.path.exists(SOTA_ALL_X.outx):
+        os.makedirs(SOTA_ALL_X.outx)
     Summary = pd.DataFrame()
     voxel = float(SOTA_ALL_X.voxelvalue)
     noise_red_val = int(SOTA_ALL_X.noise_red_val)
@@ -147,10 +153,14 @@ def run_sota(ALL_VAR):
         files = glob.glob(os.path.join(SOTA_ALL_VAR.tiling_dir , '*'))
         for f in files:
             os.remove(f)
-
-        for img in glob.glob(os.path.join(input_dir , "*.tif")):
+        allImages = []
+        for ext in ALL_FORMAT:
+            allImages.extend(glob.glob(os.path.join(fNameX.input['pathStrX'],ext)))
+        print(datetime.datetime.now(), "[2][decade.tw][monitor][different]allImages=", allImages)
+        for img in allImages:
+        # for img in glob.glob(os.path.join(SOTA_ALL_X.inx , "*.tif")):
             image2 = cv2.cvtColor(cv2.imread(img), cv2.COLOR_BGR2GRAY)
-            print('img[folderLen:]',img[folderLen:])
+            # print('img[folderLen:]',img[folderLen:])
             height = int(image2.shape[0] / SOTA_ALL_X.tilevalx)
             width = int(image2.shape[1] / SOTA_ALL_X.tilevaly)
             for row in range(SOTA_ALL_X.tilevalx):
@@ -179,9 +189,9 @@ def run_sota(ALL_VAR):
 
     # List files:
     if SOTA_ALL_X.segments == 1:
-        files = glob.glob(os.path.join(input_dir , "*.tif")) + glob.glob(os.path.join(SOTA_ALL_VAR.tiling_dir , "/*.tif"))
+        files = glob.glob(os.path.join(SOTA_ALL_X.inx, ALL_FORMAT_STR))+glob.glob(os.path.join(SOTA_ALL_X.tiling_dir, ALL_FORMAT_STR))
     else:
-        files = glob.glob(os.path.join(input_dir , "*.tif"))
+        files = glob.glob(os.path.join(SOTA_ALL_X.inx, ALL_FORMAT_STR))
 
     # Analysis GLCM and sarcomere length, loop over folder
     pbar = tqdm(files)
@@ -206,7 +216,7 @@ def run_sota(ALL_VAR):
         # multithread function of GLCM and save df2 to .csv
         Parallel(n_jobs=num_cores, prefer="threads")(delayed(algorithm)(iAngle) for iAngle in angles)
 
-        df2.to_csv(os.path.join(output_dir,image_ID + '_corr' + ".csv"))
+        df2.to_csv(os.path.join(SOTA_ALL_X.outx,image_ID + '_corr' + ".csv"))
 
         # Peak detection in and amplitude calculation in all curves
         # maximum sarcomere length taken into account here
@@ -233,7 +243,7 @@ def run_sota(ALL_VAR):
         scaled_maxcurve = pd.DataFrame(pd.Series(x_new), columns=['Offset'])
         scaled_maxcurve['Correlation'] = y_new.tolist()
         if SOTA_ALL_X.output_Interpolated_data == 1:
-            scaled_maxcurve.to_csv(output_dir + image_ID + 'int' + ".csv")
+            scaled_maxcurve.to_csv(SOTA_ALL_X.outx + image_ID + 'int' + ".csv")
 
         peak_s_length = find_peaks(y_new)[0]
         flag = not numpy.any(peak_s_length)
@@ -283,7 +293,7 @@ def run_sota(ALL_VAR):
             plt.ylabel('Correlation')
             fig = plt.gcf()
 
-            fig.savefig(os.path.join(output_dir , image_ID + '_output' + '.tif'))
+            fig.savefig(os.path.join(SOTA_ALL_X.outx , image_ID + '_output' + '.tif'))
 
         # Create new GLCM with furthest pixel offset for ASM and Homogeneity
         glcm = graycomatrix(gray_image,
@@ -300,9 +310,10 @@ def run_sota(ALL_VAR):
              asm, homogeneity]]
         final = pd.DataFrame(data, columns=['Name', 'Sarcomere length', 'Angle', 'Sarcomere Organization Score',
                                             'Alignment index', 'Uniformity', 'Homogeneity'])
+
         Summary = Summary._append(final)
 
-        Summary.to_csv(os.path.join(output_dir , Path(img).name + "_Summary" +  ".csv"))
+        Summary.to_csv(os.path.join(SOTA_ALL_X.outx , Path(img).name + "_Summary" +  ".csv"))
 
 def directory_modified(dir_path, poll_timeout=1):
     init_mtime = os.stat(dir_path).st_mtime
@@ -312,7 +323,7 @@ def directory_modified(dir_path, poll_timeout=1):
             init_mtime = now_mtime
             print(datetime.datetime.now(),"[1][decade.tw][monitor][different]input=",fNameX.input,", output=",fNameX.output)
             allImages = []
-            for ext in ('*.gif', '*.png', '*.jpg','*.tif'):
+            for ext in ALL_FORMAT:
                 allImages.extend(glob.glob(os.path.join(fNameX.input['pathStrX'],ext)))
             # allImages=glob.glob(att_dir_input+os.sep+'*.jpg')
             print(datetime.datetime.now(), "[2][decade.tw][monitor][different]allImages=", allImages)
@@ -325,28 +336,63 @@ def directory_modified(dir_path, poll_timeout=1):
             print(datetime.datetime.now(),"[O][ionis][AI-Model-Level=medium][InputFolder][monitoring..]",fNameX.input['pathStrX'])
         time.sleep(poll_timeout)
 
-def thread_safe_predict(yolo_model, image_path):
-    """Performs thread-safe prediction on an image using a locally instantiated YOLO model."""
-    yolo_results = yolo_model.predict(image_path,classes=[0],conf=0.5)
-    for result in yolo_results:
-        boxes = result.boxes  # Boxes object for bounding box outputs
-        masks = result.masks  # Masks object for segmentation masks outputs
-        keypoints = result.keypoints  # Keypoints object for pose outputs
-        probs = result.probs  # Probs object for classification outputs
-        obb = result.obb  # Oriented boxes object for OBB outputs
-        # result.show()  # display to screen
-        result.save(filename=fNameX.processed['pathObjX'].joinpath( Path(image_path).name+'.AI' + Path(image_path).suffix ))
+def thread_safe_predict(_yolo_model, _image_path):
+    imgNameFolder=fNameX.output['pathObjX'].joinpath(Path(_image_path).stem)
 
-        Path(image_path).rename(fNameX.processed['pathObjX'].joinpath(Path(image_path).name))
+    if (os.path.exists(imgNameFolder)):
+        shutil.rmtree(imgNameFolder.absolute())
+    for which_class in range(len(_yolo_model.names)):
+        confX=0.1
+        # which_class=0
 
-        for index in range(len(masks)):
-            img = numpy.copy(result.orig_img)
-            b_mask = numpy.zeros(img.shape[:2], numpy.uint8)
-            contour = masks[index].xy[0].astype(numpy.int32).reshape(-1, 1, 2)
-            cv2.drawContours(b_mask, [contour], -1, (255, 255, 255), cv2.FILLED)
-            mask3ch = cv2.cvtColor(b_mask, cv2.COLOR_GRAY2BGR)
-            isolated = cv2.bitwise_and(mask3ch, img)
-            cv2.imwrite(fNameX.output['pathObjX'].joinpath(Path(image_path).name+'.ISO.'+str(index)+'' + Path(image_path).suffix).absolute().as_posix(), isolated)
+        yolo_results=[]
+        while len(yolo_results)==0 and confX > 0 :
+            print('[][start-predict][using conf]=', confX, _yolo_model.names)
+            yolo_results = _yolo_model.predict(_image_path, classes=[which_class], conf=confX)
+            confX-=0.05
+            if len(yolo_results)>0 :
+                print('[AI][FOUND!!][result count]=', len(yolo_results), yolo_results)
+                break
+        classFolder = imgNameFolder.joinpath(_yolo_model.names[which_class])
+        classResultName = imgNameFolder.joinpath(_yolo_model.names[which_class])
+        # cropFolder = classFolder.joinpath('crop')
+        cropFolder = classFolder
+        cropFolder.mkdir(mode=0o777, parents=True, exist_ok=True)
+        isoFolder = classFolder.joinpath('iso')
+        isoFolder.mkdir(mode=0o777, parents=True, exist_ok=True)
+
+
+
+        for result_index in range(len(yolo_results)):
+            yolo_results[result_index].save(filename=classFolder.joinpath(
+                Path(_image_path).name + '.AI.' + str(result_index) + Path(_image_path).suffix))
+            yolo_results[result_index].save_crop(save_dir=cropFolder)
+            if cropFolder.joinpath(_yolo_model.names[which_class]).exists():
+                os.rename(cropFolder.joinpath(_yolo_model.names[which_class]),cropFolder.joinpath('crop'))
+
+            # boxes = result.boxes  # Boxes object for bounding box outputs
+            masks = yolo_results[result_index].masks  # Masks object for segmentation masks outputs
+            # keypoints = result.keypoints  # Keypoints object for pose outputs
+            # probs = result.probs  # Probs object for classification outputs
+            # obb = result.obb  # Oriented boxes object for OBB outputs
+            # result.show()  # display to screen
+            print('[AI][FOUND!!][result masks]=', masks)
+            if masks is not None:
+                for index in range(len(masks)):
+                    img = numpy.copy(yolo_results[result_index].orig_img)
+                    b_mask = numpy.zeros(img.shape[:2], numpy.uint8)
+                    contour = masks[index].xy[0].astype(numpy.int32).reshape(-1, 1, 2)
+
+                    cv2.drawContours(b_mask, [contour], -1, (255, 255, 255), cv2.FILLED)
+                    mask3ch = cv2.cvtColor(b_mask, cv2.COLOR_GRAY2BGR)
+                    isolated = cv2.bitwise_and(mask3ch, img)
+                    # crop_img = img[y:y + h, x:x + w]
+                    save_path_iso= isoFolder.joinpath('iso.' + str(index) + Path(_image_path).suffix)
+
+                    print('[][][savePath]',save_path_iso)
+                    cv2.imwrite(save_path_iso, isolated)
+    Path(_image_path).rename(fNameX.processed['pathObjX'] / Path(_image_path).name)
+
 
 def yolo_decade(raw=None,imagePath=None,allImages=None):
     resultFinal=[]
@@ -369,7 +415,7 @@ def yolo_decade(raw=None,imagePath=None,allImages=None):
 
 
 directory_modified(fNameX.input['pathStrX'], 5)
-Thread(target=run_sota, args=[SOTA_ALL_VAR] ).start()
+# Thread(target=run_sota, args=[SOTA_ALL_VAR] ).start()
 # run_sota(fNameX.output['pathStrX'], fNameX.sota['pathStrX'])
 
 #pip install ultralytics
