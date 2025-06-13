@@ -35,8 +35,20 @@ from joblib import Parallel, delayed
 # DECADE_MODEL='best_redSeg_ultralytics.pt'
 ALL_FORMAT=('*.png', '*.jpg','*.tif')
 ALL_FORMAT_STR='*.{png,jpg,tif}'
-DECADE_MODEL='model_- 24 february 2025 4_22.pt'
+DECADE_MODEL='redV1.pt'
 home = Path.home().joinpath('sacoMeasure')
+
+class BColors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 class fNameX(dict, Enum):
     input:dict =     {'pathObjX':None,'pathStrX':'','nameX': 'input'}
     processed:dict = {'pathObjX':None,'pathStrX':'','nameX': 'processed',}
@@ -333,23 +345,24 @@ def directory_modified(dir_path, poll_timeout=1):
                 yolo_decade(None,imagepathObjX)
                 # os.remove(imagepathObjX)
         else:
-            print(datetime.datetime.now(),"[O][ionis][AI-Model-Level=medium][InputFolder][monitoring..]",fNameX.input['pathStrX'])
+            print(datetime.datetime.now(),"[O][ionis][AI-Model-Level=medium][InputFolder][monitoring..]",BColors.WARNING ,fNameX.input['pathStrX'],BColors.ENDC)
+
         time.sleep(poll_timeout)
 
 def thread_safe_predict(_yolo_model, _image_path):
     imgNameFolder=fNameX.output['pathObjX'].joinpath(Path(_image_path).stem)
 
-    if (os.path.exists(imgNameFolder)):
+    if os.path.exists(imgNameFolder):
         shutil.rmtree(imgNameFolder.absolute())
     for which_class in range(len(_yolo_model.names)):
-        confX=0.1
+        confX=0.01
         # which_class=0
 
         yolo_results=[]
         while len(yolo_results)==0 and confX > 0 :
             print('[][start-predict][using conf]=', confX, _yolo_model.names)
             yolo_results = _yolo_model.predict(_image_path, classes=[which_class], conf=confX)
-            confX-=0.05
+            confX-=0.0005
             if len(yolo_results)>0 :
                 print('[AI][FOUND!!][result count]=', len(yolo_results), yolo_results)
                 break
