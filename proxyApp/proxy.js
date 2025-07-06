@@ -101,7 +101,8 @@ async function multerServer(port){
             cb(null, folder_home_sarcoMeasure_upload);
         },
         filename: function (req, file, cb) {
-            cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+            // Save with original filename
+            cb(null, file.originalname);
         }
     });
 

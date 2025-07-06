@@ -253,7 +253,7 @@ def thread_safe_predict(_yolo_model, _image_path):
             # obb = result.obbs.cpu().numpy()
             result.save(filename=classFolder.joinpath('result_All_ID_' + str(result_index)+'__' + Path(_image_path).name) )
             result.save_crop(save_dir=cropFolder,file_name='result_Crop_ID_' + str(result_index)+'__' + Path(_image_path).name)
-            result.save_txt(txt_file='result_Txt_ID_' + str(result_index)+'__' + Path(_image_path).name)
+            result.save_txt(txt_file=classFolder.joinpath('result_Txt_ID_' + str(result_index)+'__' + Path(_image_path).stem+'.txt') )
 
             masks = result.masks  # Masks object for segmentation masks outputs
             if masks is not None:
