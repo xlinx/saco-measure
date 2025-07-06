@@ -1,0 +1,56 @@
+{
+  "name": "proxyserver",
+  "version": "0.0.1",
+  "main": "proxy.js",
+  "type": "module",
+  "source": [
+    "app.js"
+  ],
+  "scripts": {
+    "run_proxy": "node proxy.js",
+    "build": "node bquild index.html",
+    "uglifyALL": "npm run uglify1 && npm run uglify2 && npm run scp",
+    "uglify1": "uglifyjs proxy.js --source-map -c -m -o proxy.min.js",
+    "uglify2": "uglifyjs useStoreS.js --source-map -c -m -o useStoreS.min.js",
+    "scp": "cd /Users/xlinx/IdeaProjects/BSL_MFN300B_Electron/ && sh scp.sh",
+    "clean:output": "rm -rf dist/*",
+    "unuses_pkg": "npm install depcheck -g && depcheck"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "express": "^5.1.0",
+    "ip": "^2.0.1",
+    "multer": "^2.0.1",
+    "node-html-better-parser": "1.4.11",
+    "ws": "^8.18.2"
+  },
+  "unuse-dependencies": {
+    "http-proxy-middleware": "^3.0.5",
+    "screenshot-desktop": "1.15.1",
+    "bufferutil": "^4.0.9",
+    "base64-js": "1.5.1",
+    "discord.js": "^14.17.3",
+    "find-process": "^1.4.10",
+    "loglevel": "^1.9.2",
+    "node-cron": "^3.0.3",
+    "zlib-sync": "^0.1.9"
+  },
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "xlinx",
+      "repo": "BSL_M4Video"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xlinx/AutoUpdateX.git"
+  },
+  "author": "xlinx",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xlinx/AutoUpdateX/issues"
+  },
+  "homepage": "https://github.com/xlinx/AutoUpdateX#readme",
+  "description": ""
+}

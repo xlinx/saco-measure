@@ -1,21 +1,38 @@
 import {
     Layout,
+    Alert, Flex, Card, ConfigProvider, Space, Button, Divider,
+    Radio,
+    Slider, Input, Image, Breadcrumb,
 
-    Alert, Flex, Card, Image, theme, ConfigProvider, Space, Button,
+} from 'antd';
+import {HomeOutlined, UserOutlined} from '@ant-design/icons';
+import {useEffect, useState} from 'react'
 
-} from 'antd'
-
-import  {useEffect, useState} from 'react'
-
-const {Content, Footer, Sider} = Layout
 
 import Marquee from 'react-fast-marquee'
-
+import {MenuUnfoldOutlined, AudioOutlined} from "@ant-design/icons";
 // import { FileManager } from "@cubone/react-file-manager";
 // import "@cubone/react-file-manager/dist/style.css";
 import Flmngr from "@flmngr/flmngr-react";
 import * as React from "react";
 
+const {Search} = Input;
+const {Content, Footer, Sider} = Layout
+import GalleryX from "./GalleryX.jsx";
+import sacoSvgLogo3 from "../assets/sacoSvgLogo3.svg";
+import {Header} from "antd/es/layout/layout.js";
+
+const marks = {
+    0: '0%',
+    50: '50%',
+    75: '75%',
+    100: {
+        style: {
+            color: '#f50',
+        },
+        label: <strong>100%</strong>,
+    },
+};
 // import Flmngr from "flmngr";
 // import Flmngr from "https://cdn.skypack.dev/flmngr";
 function attachFileManager() {
@@ -45,49 +62,7 @@ function attachFileManager() {
 }
 
 
-export class MyButton extends React.Component {
 
-    render() {
-        let fm_url='http://'+window.location.hostname+':3128/fm'
-        console.log("MyButton fm_url=",fm_url)
-        return  <>
-        
-
-        <Button
-            onClick={() => {
-                // Flmngr.load({
-                //     apiKey: "FLMN24RR1234123412341234",
-                //     urlFileManager: 'http://'+window.location.hostname+':3128/fm', // demo server
-                //     urlFiles: '/ftp',
-                // }, {
-                //     onFlmngrLoaded: () => {
-                //     attachFileManager();
-                // }
-                // });
-                // Flmngr.load({
-                //     apiKey: "FLMN24RR1234123412341234",                  // default free key
-                //     urlFileManager: 'http://127.0.0.1:3128/fm', // demo server
-                //     urlFiles: 'http://localhost:3128/ftp/',
-                // });
-                Flmngr.open({
-                    apiKey: "wItxl0ctkVVg44EonzgNnMhP",
-                    urlFileManager: 'http://'+window.location.hostname+':3128/fm', // demo server
-                    urlFiles: 'http://'+window.location.hostname+':3128/ftp',
-                    isMultiple: false,                                   // let selecting a single file
-                    acceptExtensions: ["png", "jpg", "jpeg", "tif","tiff", "webp"],
-                    onFinish: (files) => {
-                        console.log("User picked:");
-                        console.log(files);
-                    }
-                });
-            }}
-        >
-            Open file manager
-        </Button>
-        </>
-    }
-
-}
 
 
 const StaticHTML = () => {
@@ -98,7 +73,7 @@ const StaticHTML = () => {
     useEffect(() => {
         const intervalId = setInterval(() => {  //assign interval to a variable to clear it.
             window.electron?.ipcRenderer.invoke('toMain',
-                { WHO:'p3'}).then(
+                {WHO: 'p3'}).then(
                 (r) => {
                     console.log('[][P3][invoke][then]r=', r)
                     setFiles(r.dirTree_SacoMeasure)
@@ -109,7 +84,7 @@ const StaticHTML = () => {
 
         return () => clearInterval(intervalId); //This is important
 
-    }, [ useState])
+    }, [useState])
     const [files, setFiles] = useState([
         {
             name: "2Input",
@@ -144,8 +119,8 @@ const StaticHTML = () => {
         },
     ]);
 
-    const CustomImagePreviewer = ({ file }) => {
-        return <img src={`${file.path}`} alt={file.name} />;
+    const CustomImagePreviewer = ({file}) => {
+        return <img src={`${file.path}`} alt={file.name}/>;
     };
     return (
         <>
@@ -162,50 +137,59 @@ const StaticHTML = () => {
                            }
                     />
                     <Flex gap="middle" align="center" justify="center" vertical>
-                        <Card title={'Saco File Manager'} style={{width:'100%', height:'100%'}}>
-                            <div className="control-section">
-fff
-                            </div>
-                        </Card>
-                        <Card title={'Saco File Manager'} style={{width:'100%', height:'100%'}}>
-                            <ConfigProvider
-                                theme={{
-                                    token: {
-                                        colorText: '#f00',
-                                        colorPrimaryBg: '#111',
-                                        colorTextBase: '#0f0',
-                                        colorBgMask: '#0f0',
-                                        background:'#00f',
-                                    },
-                                    components: {
-                                        button: {
-                                            background:'#00f',
-                                            algorithm: false,
-                                        },
-                                        Button: {
-                                            colorPrimary: '#00b96b',
-                                            algorithm: false,
-                                        },
-                                        Input: {
-                                            colorPrimary: '#eb2f96',
-                                            algorithm: false,
+
+                        <Divider variant="dashed" style={{ borderColor: '#333'}} orientation="center" ></Divider>
+
+                        <Card
+                            title={'AI.Model Information'}
+                            hoverable
+                            style={{
+                                width: '95vw',
+                            }}
+                            // cover={<Image alt="example" src={sacoSvgLogo3} width="100px" />}
+                        >
+                            <Divider style={{borderColor: '#7cb305'}} orientation="center">Model Setting</Divider>
+                            <Space>
+                                <Radio.Group defaultValue="m" buttonStyle="solid">
+                                    <Radio.Button value="n" disabled>nano|5Mb</Radio.Button>
+                                    <Radio.Button value="s" disabled>small|30Mb</Radio.Button>
+                                    <Radio.Button value="m">Medium|70Mb</Radio.Button>
+                                    <Radio.Button value="l" disabled>Large|150Mb</Radio.Button>
+                                    <Radio.Button value="x" disabled>Xtra|350Mb</Radio.Button>
+                                </Radio.Group>
+                                <Search
+                                    addonBefore="Model Select"
+                                    placeholder=" (default: best.pt)"
+                                    enterButton="Switch Model"
+                                    size="large"
+                                    suffix={<AudioOutlined
+                                        style={{
+                                            fontSize: 1,
+                                            color: '#1677ff',
+                                        }}
+                                    />}
+                                    onSearch={
+                                        (val) => {
+                                            console.log('[][P1][onSearch]val=', val)
+                                            // let indexMain=new remote.BrowserWindow({width:200})
+                                            // indexMain.loadURL('http://localhost:3000/#/tab1')
+                                            window.electron?.ipcRenderer.invoke('toMain',
+                                                {case: 'handleFileOpen', value: val}).then(
+                                                (r) => {
+                                                    console.log('[][P1][invoke][then]r=', r)
+                                                }
+                                            )
                                         }
-                                    },
-                                }}
-                            >
-                                <Card style={{width: '100%', height: '100%'}}>
-                                    {/*<FileManager files={files}*/}
-                                    {/*    // filePreviewComponent={(file) => <CustomImagePreviewer file={file} />}*/}
-                                    {/*/>*/}
-                                    <MyButton></MyButton>
-                                    <div className="loading-full-screen">
-                                        <div id="loading">Loading folder listing...</div>
-                                    </div>
-                                </Card>
-
-
-                            </ConfigProvider>
+                                    }
+                                />
+                            </Space>
+                            <Divider style={{borderColor: '#333'}} orientation="center">Predict conferdence</Divider>
+                            <Slider marks={marks} included={false} defaultValue={75}/>
+                            <Slider marks={marks} included={false} defaultValue={75}/>
+                            <Slider marks={marks} included={false} defaultValue={75}/>
+                            <Slider marks={marks} included={false} defaultValue={75}/>
                         </Card>
+
                         <Footer className="contentFooter">
                             saco-Measure | 2025
                         </Footer>

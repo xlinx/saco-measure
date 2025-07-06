@@ -25,3 +25,7 @@ ultralytics==8.3.74
 tensorflow==2.15.0
 tensorflow-cpu==2.15.0
 tensorflowjs==2.0.0
+
+# HTTP Server dependencies
+Flask==2.3.3
+Werkzeug==2.3.7

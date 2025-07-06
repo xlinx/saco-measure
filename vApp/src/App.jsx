@@ -4,7 +4,7 @@ import './App.css'
 import './App.css'
 import {
     Col,
-    ConfigProvider,
+    ConfigProvider, Image,
     Layout,
     Row,
     Tabs,
@@ -26,6 +26,7 @@ import { AlertFilled, LeftOutlined, MenuUnfoldOutlined, SwapOutlined } from '@an
 const { Header, Content, Footer } = Layout;
 
 import { createStyles } from 'antd-style';
+import sacoSvgLogo3 from "./assets/sacoSvgLogo3.svg";
 
 const useStyle = createStyles(({ prefixCls, css }) => ({
     linearGradientButton: css`
@@ -53,20 +54,20 @@ const useStyle = createStyles(({ prefixCls, css }) => ({
 const tabs = [
     {
         key: '/tab1',
-        title: 'saco-greenPoly',
-        label: 'saco-greenPoly',
+        title: 'predict & measure',
+        label: 'predict & measure',
         icon: <AppOutline />
     },
     {
         key: '/tab2',
-        title: 'saco-blueTrend',
-        label: 'saco-blueTrend',
+        title: 'sarco-setting',
+        label: 'sarco-setting',
         icon: <UnorderedListOutline />
     },
     {
         key: '/tab3',
-        title: 'saco-redCalc',
-        label: 'saco-redCalc',
+        title: 'model-setting',
+        label: 'model-setting',
         icon: <MenuUnfoldOutlined />
     },
     {
@@ -117,13 +118,13 @@ function App() {
 
     const HeaderLeft = () => {
         return (
-            <div><LeftOutlined /></div>
+            <Image src={sacoSvgLogo3} height={'200px'} style={{padding:'-0px'}} className=" logo-spin "/>
         )
     }
     const HeaderCenter = () => {
         return (
             <span style={{ fontWeight: 'bold', fontSize: '20px', padding: '0px', margin: '0px' }}>
-                saco measure center
+                Sarco Measure Center
             </span>
         )
     }
@@ -137,7 +138,7 @@ function App() {
                             animation: s1 ? 'specialFade 2s forwards ease' : 'specialFadeRed 4s forwards ease'
 
                         }} />
-                        &nbsp; App
+                        &nbsp; AI.Model.Server.info
                         <SwapOutlined style={{
                             // "-webkit-transform": scale(-1,1),
                             transform: s1 ? 'scale(-1,1)' : 'scale(1,1)',

@@ -11,6 +11,8 @@ const getBase64 = (file) =>
     });
 
 export const UploadX = () => {
+    const uploadURL=`http://${window.location.hostname}:20021/upload`
+    // console.log('uploadURL',uploadURL)
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState([
@@ -45,7 +47,7 @@ export const UploadX = () => {
     return (
         <>
             <Upload
-                action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+                action={uploadURL}
                 listType="picture-card"
                 fileList={fileList}
                 onPreview={handlePreview}

@@ -362,9 +362,11 @@ def thread_safe_predict(_yolo_model, _image_path):
         while len(yolo_results)==0 and confX > 0 :
             print('[][start-predict][using conf]=', confX, _yolo_model.names)
             yolo_results = _yolo_model.predict(_image_path, classes=[which_class], conf=confX)
+            # confX-=0.0005
             confX-=0.0005
+
             if len(yolo_results)>0 :
-                print('[AI][FOUND!!][result count]=', len(yolo_results), yolo_results)
+                print(BColors.BOLD,'[AI][FOUND!!][result count]',BColors.ENDC, len(yolo_results), yolo_results)
                 break
         classFolder = imgNameFolder.joinpath(_yolo_model.names[which_class])
         classResultName = imgNameFolder.joinpath(_yolo_model.names[which_class])
@@ -373,7 +375,6 @@ def thread_safe_predict(_yolo_model, _image_path):
         cropFolder.mkdir(mode=0o777, parents=True, exist_ok=True)
         isoFolder = classFolder.joinpath('iso')
         isoFolder.mkdir(mode=0o777, parents=True, exist_ok=True)
-
 
 
         for result_index in range(len(yolo_results)):

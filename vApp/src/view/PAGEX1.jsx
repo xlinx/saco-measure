@@ -14,10 +14,10 @@ import {
     Menu,
     theme,
     ConfigProvider,
-    Slider, Input, Row, Col,
+    Slider, Input, Row, Col, Timeline,
 
 } from 'antd';
-import { HomeOutlined, UserOutlined } from '@ant-design/icons';
+import {ClockCircleOutlined, HomeOutlined, UserOutlined} from '@ant-design/icons';
 
 // import remote from '@electron/remote';
 // const { BrowserWindow } = require('@electron/remote')
@@ -28,44 +28,20 @@ import sacoSvgLogo3 from '../assets/sacoSvgLogo3.svg'
 import {AppOutline, StarFill, UnorderedListOutline,} from "antd-mobile-icons";
 import {MenuUnfoldOutlined,AudioOutlined} from "@ant-design/icons";
 // import Marquee from "react-fast-marquee";
-import {UploadX} from "./UploadX.jsx";
+// import {UploadX} from "./UploadX.jsx";
 import GalleryX from "./GalleryX.jsx";
 
 
 
 
 
-const marks = {
-    0: '0%',
-    50: '50%',
-    75: '75%',
-    100: {
-        style: {
-            color: '#f50',
-        },
-        label: <strong>100%</strong>,
-    },
-};
+
 const StaticHTML = () => {
     // const navigate = useNavigate();
 
     return (
-
             <Layout >
-                <Header
-                    style={{
-                        display: 'flex',
-                        width:"100%",
-                        alignItems: 'center',
-                    }}
-                >
-                    <Image src={sacoSvgLogo3} width="200px" className=" logo-spin react"/>
-
-
-                </Header>
-
                 <Content style={{  margin:'0px',padding: '20px' }}>
-
                     <Breadcrumb
                         style={{
                             margin: '16px 0',
@@ -90,84 +66,39 @@ const StaticHTML = () => {
                         ]}
                     />
 
-                    <Card
-                        hoverable
-                        style={{
-                            width: '95vw',
-                        }}
-                        // cover={<Image alt="example" src={sacoSvgLogo3} width="100px" />}
-                    >
-                        <Divider style={{borderColor: '#7cb305'}}  orientation="center" >Model Setting</Divider>
 
-                        <Space>
-                            <Radio.Group defaultValue="m" buttonStyle="solid">
-                                <Radio.Button value="n" disabled>nano|5Mb</Radio.Button>
-                                <Radio.Button value="s" disabled>small|30Mb</Radio.Button>
-                                <Radio.Button value="m"         >Medium|70Mb</Radio.Button>
-                                <Radio.Button value="l" disabled>Large|150Mb</Radio.Button>
-                                <Radio.Button value="x" disabled>Xtra|350Mb</Radio.Button>
-                            </Radio.Group>
-                            <Search
-                                addonBefore="Model Select"
-                                placeholder=" (default: best.pt)"
-                                enterButton="Switch Model"
-                                size="large"
-                                suffix={<AudioOutlined
-                                    style={{
-                                        fontSize: 1,
-                                        color: '#1677ff',
-                                    }}
-                                />}
-                                onSearch={
-                                    (val) => {
-                                        console.log('[][P1][onSearch]val=', val)
-                                        // let indexMain=new remote.BrowserWindow({width:200})
-                                        // indexMain.loadURL('http://localhost:3000/#/tab1')
-                                        window.electron?.ipcRenderer.invoke('toMain',
-                                            { case: 'handleFileOpen',value: val}).then(
-                                            (r) => {
-                                                console.log('[][P1][invoke][then]r=', r)
-                                            }
-                                        )
-                                    }
-                                }
-                            />
-
-
-
-                        </Space>
-                        <Divider style={{borderColor: '#333'}} orientation="center" >Predict conferdence</Divider>
-                        <Slider marks={marks} included={false} defaultValue={75} />
-                        <Slider marks={marks} included={false} defaultValue={75} />
-                        <Slider marks={marks} included={false} defaultValue={75} />
-                        <Slider marks={marks} included={false} defaultValue={75} />
-                    </Card>
                     <Divider variant="dashed" style={{ borderColor: '#333'}} orientation="center" ></Divider>
+
                     <Row gutter={16}>
                         <Col className="gutter-row" span={12}>
                             <Card>
-                                <Divider style={{fontSize:'2em',borderColor: '#7cb305'}} >Input</Divider>
+                                <Divider style={{fontSize:'2em',borderColor: '#7cb305'}} >Upload to Input</Divider>
                                 {/*<UploadX/>*/}
-                                <GalleryX upload={true} folderName={'input'}/>
+                                <GalleryX upload={true} folderName={'upload'}/>
                             </Card>
                         </Col>
                         <Col className="gutter-row" span={12}>
                             <Card>
-                                <Divider style={{fontSize:'2em',borderColor: '#7cb305'}} >output</Divider>
-                                <GalleryX folderName={'output'}/>
+                                <Divider style={{fontSize:'2em',borderColor: '#7cb305'}} >Input</Divider>
+                                <GalleryX folderName={'input'}/>
                             </Card>
                         </Col>
                     </Row>
                     <Divider variant="dashed" style={{borderColor: '#333'}} orientation="center" ></Divider>
                     <Card>
-                        <Divider style={{fontSize:'2em',borderColor: '#7cb305'}} >Processed</Divider>
-                          <GalleryX folderName={'processed'}/>
+
+                        <Divider style={{fontSize:'2em',borderColor: '#7cb305'}} >Processing </Divider>
+
+                        <GalleryX folderName={'processed'}/>
+
+
                     </Card>
                     <Divider variant="dashed" style={{borderColor: '#333'}} orientation="center" ></Divider>
                     <Card>
-                    <Divider style={{fontSize:'2em',borderColor: '#7cb305'}} >SotaTool</Divider>
-                      <GalleryX folderName={'sota'}/>
+                        <Divider style={{fontSize:'2em',borderColor: '#7cb305'}} >Output (Image|CSV)</Divider>
+                          <GalleryX folderName={'output'}/>
                     </Card>
+
                     {/*<Divider style={{borderColor: '#7cb305'}} >WorkingPanel</Divider>*/}
                     {/*<Space direction="vertical" size={16}>*/}
                     {/*    <Card hoverable title="Input">*/}

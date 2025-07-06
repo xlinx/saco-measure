@@ -83,6 +83,8 @@ root#root {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 .logo-spin{
+
+
   animation: logo-spin infinite 2s ease-in-out alternate;
 }
 @keyframes logo-spin {
