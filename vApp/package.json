@@ -10,7 +10,8 @@
     "v_preview": "vite preview",
     "scp_o4": "rsync -avzh -e 'ssh -p 22' --progress --delete --exclude 'node_modules' dist/* ubuntu@o4.decade.tw:/var/www/node/sarco/",
     "scp_o4_pyApp": "rsync -avzh -e 'ssh -p 22' --progress --delete --exclude 'node_modules' ../pyApp/* ubuntu@o4.decade.tw:/var/www/node/sarco_pyApp/",
-    "scp_o4_proxy": "rsync -avzh -e 'ssh -p 22' --progress --delete --exclude 'node_modules' ../proxyServer/* ubuntu@o4.decade.tw:/var/www/node/sarcoProxy/"
+    "scp_o4_pyApp_userfolder": "rsync -avzh -e 'ssh -p 22' --progress --delete --exclude 'node_modules' ~/sarcoMeasure/* ubuntu@o4.decade.tw:~/sarcoMeasure/",
+    "scp_o4_proxy": "rsync -avzh -e 'ssh -p 22' --progress --delete --exclude 'node_modules' ../proxyApp/* ubuntu@o4.decade.tw:/var/www/node/sarco_proxyApp/"
   },
   "dependencies": {
     "@ant-design/icons": "^5.6.1",

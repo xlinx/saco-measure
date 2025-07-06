@@ -94,10 +94,10 @@ const StaticHTML = () => {
 
                     </Card>
                     <Divider variant="dashed" style={{borderColor: '#333'}} orientation="center" ></Divider>
-                    <Card>
-                        <Divider style={{fontSize:'2em',borderColor: '#7cb305'}} >CSV Preview</Divider>
-                        <GalleryX folderName={'output'} filter={'csv'}/>
-                    </Card>
+                    {/*<Card>*/}
+                    {/*    <Divider style={{fontSize:'2em',borderColor: '#7cb305'}} >CSV Preview</Divider>*/}
+                    {/*    <GalleryX folderName={'output'} filter={'csv'}/>*/}
+                    {/*</Card>*/}
                     <Divider variant="dashed" style={{borderColor: '#333'}} orientation="center" ></Divider>
                     <Card>
                         <Divider style={{fontSize:'2em',borderColor: '#7cb305'}} >Output (Image|CSV)</Divider>

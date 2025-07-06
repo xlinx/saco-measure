@@ -199,44 +199,51 @@ export function GalleryX(props) {
                                         <div
                                             style={{}}
                                         >
-                                            {filter !== 'csv' ?<>
-                                                <FolderOpenOutlined style={{fontSize: '48px'}} />
+                                            <FolderOpenOutlined style={{fontSize: '48px'}} />
                                             <div style={{marginTop: '8px'}}>
                                                 <Tag color="gold">FOLDER</Tag>
                                                 <div style={{fontSize: '12px', color: '#666'}}>
                                                     Directory
                                                 </div>
-                                            </div></>
-                                            :<>
-                                                <div onClick={() => previewCsv(item.filename)}>
-                                                    <FileExcelOutlined style={{fontSize: '48px', color: '#52c41a'}} />
-                                                    <div style={{marginTop: '8px'}}>
-                                                        <Tag color="green">CSV</Tag>
-                                                        <div style={{fontSize: '12px', color: '#666'}}>
-                                                            Click to preview
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div onClick={() => previewCsv(item.filename)}>
-                                                    <FileExcelOutlined style={{fontSize: '48px', color: '#52c41a'}} />
-                                                    <div style={{marginTop: '8px'}}>
-                                                        <Tag color="green">CSV</Tag>
-                                                        <div style={{fontSize: '12px', color: '#666'}}>
-                                                            Click to preview
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div onClick={() => previewCsv(item.filename)}>
-                                                    <FileExcelOutlined style={{fontSize: '48px', color: '#52c41a'}} />
-                                                    <div style={{marginTop: '8px'}}>
-                                                        <Tag color="green">CSV</Tag>
-                                                        <div style={{fontSize: '12px', color: '#666'}}>
-                                                            Click to preview
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                </>
-                                            }
+                                            </div>
+                                            {/*{filter !== 'csv' ?<>*/}
+                                            {/*    <FolderOpenOutlined style={{fontSize: '48px'}} />*/}
+                                            {/*<div style={{marginTop: '8px'}}>*/}
+                                            {/*    <Tag color="gold">FOLDER</Tag>*/}
+                                            {/*    <div style={{fontSize: '12px', color: '#666'}}>*/}
+                                            {/*        Directory*/}
+                                            {/*    </div>*/}
+                                            {/*</div></>*/}
+                                            {/*:<>*/}
+                                            {/*    <div onClick={() => previewCsv(item.filename)}>*/}
+                                            {/*        <FileExcelOutlined style={{fontSize: '48px', color: '#52c41a'}} />*/}
+                                            {/*        <div style={{marginTop: '8px'}}>*/}
+                                            {/*            <Tag color="green">CSV</Tag>*/}
+                                            {/*            <div style={{fontSize: '12px', color: '#666'}}>*/}
+                                            {/*                Click to preview*/}
+                                            {/*            </div>*/}
+                                            {/*        </div>*/}
+                                            {/*    </div>*/}
+                                            {/*    <div onClick={() => previewCsv(item.filename)}>*/}
+                                            {/*        <FileExcelOutlined style={{fontSize: '48px', color: '#52c41a'}} />*/}
+                                            {/*        <div style={{marginTop: '8px'}}>*/}
+                                            {/*            <Tag color="green">CSV</Tag>*/}
+                                            {/*            <div style={{fontSize: '12px', color: '#666'}}>*/}
+                                            {/*                Click to preview*/}
+                                            {/*            </div>*/}
+                                            {/*        </div>*/}
+                                            {/*    </div>*/}
+                                            {/*    <div onClick={() => previewCsv(item.filename)}>*/}
+                                            {/*        <FileExcelOutlined style={{fontSize: '48px', color: '#52c41a'}} />*/}
+                                            {/*        <div style={{marginTop: '8px'}}>*/}
+                                            {/*            <Tag color="green">CSV</Tag>*/}
+                                            {/*            <div style={{fontSize: '12px', color: '#666'}}>*/}
+                                            {/*                Click to preview*/}
+                                            {/*            </div>*/}
+                                            {/*        </div>*/}
+                                            {/*    </div>*/}
+                                            {/*    </>*/}
+                                            {/*}*/}
                                         </div>
                                     ) : isImage ? (
                                         <>
@@ -248,7 +255,7 @@ export function GalleryX(props) {
                                                 src: `${httpUrl}/${folderName}/${item.filename}`
                                             }}
                                         />
-                                            {folderName === 'precessed' ?null:
+                                            {folderName !== 'processed' ?<></>:
                                                 <>
                                                     <Carousel arrows autoplay={{ dotDuration: true }} infinite={false}>
                                                         <div>

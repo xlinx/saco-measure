@@ -6,31 +6,31 @@ import time
 from enum import Enum
 from pathlib import Path
 import datetime
-import glob
+# import glob
 from threading import Thread
-import cv2
-import json
+# import cv2
+# import json
 
 import numpy
 from ultralytics import YOLO
 # from SotaTool_decade_tw import run_sota
 # from shapely.geometry import Polygon
 #############
-from skimage import (restoration)
-import warnings
+# from skimage import (restoration)
+# import warnings
 # import numpy as np
-from skimage.feature import graycomatrix, graycoprops
+# from skimage.feature import graycomatrix, graycoprops
 import cv2
 import os
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import pandas as pd
 import glob
-import imutils
-from scipy.signal import find_peaks
-from scipy.interpolate import CubicSpline
-import matplotlib
-from tqdm import tqdm
-import seaborn as sns
+# import imutils
+#from scipy.signal import find_peaks
+#from scipy.interpolate import CubicSpline
+#import matplotlib
+#from tqdm import tqdm
+#import seaborn as sns
 import multiprocessing
 from joblib import Parallel, delayed
 
@@ -38,7 +38,7 @@ from joblib import Parallel, delayed
 # DECADE_MODEL='best_redSeg_ultralytics.pt'
 ALL_FORMAT=('*.png', '*.jpg','*.tif')
 ALL_FORMAT_STR='*.{png,jpg,tif}'
-DECADE_MODEL='redV1.pt'
+DECADE_MODEL='redv1.pt'
 home = Path.home().joinpath('sarcoMeasure')
 
 class BColors:
