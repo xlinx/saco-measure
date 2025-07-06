@@ -6,6 +6,7 @@ import {FileTextOutlined, PictureOutlined, FileExcelOutlined, FilePdfOutlined, F
 import * as path from "path";
 
 export function GalleryX(props) {
+    const [filter, setfilter] = useState(props.filter);
     const [folderName, setFolderName] = useState(props.folderName);
     const [loading, setLoading] = useState(false);
     const [dataSource, setDataSource] = useState([]);
@@ -198,13 +199,44 @@ export function GalleryX(props) {
                                         <div
                                             style={{}}
                                         >
-                                            <FolderOpenOutlined style={{fontSize: '48px'}} />
+                                            {filter !== 'csv' ?<>
+                                                <FolderOpenOutlined style={{fontSize: '48px'}} />
                                             <div style={{marginTop: '8px'}}>
                                                 <Tag color="gold">FOLDER</Tag>
                                                 <div style={{fontSize: '12px', color: '#666'}}>
                                                     Directory
                                                 </div>
-                                            </div>
+                                            </div></>
+                                            :<>
+                                                <div onClick={() => previewCsv(item.filename)}>
+                                                    <FileExcelOutlined style={{fontSize: '48px', color: '#52c41a'}} />
+                                                    <div style={{marginTop: '8px'}}>
+                                                        <Tag color="green">CSV</Tag>
+                                                        <div style={{fontSize: '12px', color: '#666'}}>
+                                                            Click to preview
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div onClick={() => previewCsv(item.filename)}>
+                                                    <FileExcelOutlined style={{fontSize: '48px', color: '#52c41a'}} />
+                                                    <div style={{marginTop: '8px'}}>
+                                                        <Tag color="green">CSV</Tag>
+                                                        <div style={{fontSize: '12px', color: '#666'}}>
+                                                            Click to preview
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div onClick={() => previewCsv(item.filename)}>
+                                                    <FileExcelOutlined style={{fontSize: '48px', color: '#52c41a'}} />
+                                                    <div style={{marginTop: '8px'}}>
+                                                        <Tag color="green">CSV</Tag>
+                                                        <div style={{fontSize: '12px', color: '#666'}}>
+                                                            Click to preview
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                </>
+                                            }
                                         </div>
                                     ) : isImage ? (
                                         <>
@@ -218,22 +250,33 @@ export function GalleryX(props) {
                                         />
                                             {folderName === 'precessed' ?null:
                                                 <>
-                                                    <Image
-                                                        src={`${httpUrl}/output/${item.filename.split('.')[0]}/redSpace/predict_redSpace__${item.filename}`}
-                                                        // style={{maxWidth: '100%', height: 'auto'}}
-                                                    />
-                                                    <Image
-                                                        src={`${httpUrl}/output/${item.filename.split('.')[0]}/redSpace/result_All_ID_0__${item.filename}`}
-                                                        // style={{maxWidth: '100%', height: 'auto'}}
-                                                    />
-                                                    <Image
-                                                        src={`${httpUrl}/output/${item.filename.split('.')[0]}/greenPoly/result_All_ID_0__${item.filename}`}
-                                                        // style={{maxWidth: '100%', height: 'auto'}}
-                                                    />
-                                                    <Image
-                                                        src={`${httpUrl}/output/${item.filename.split('.')[0]}/yellowRectangle/result_All_ID_0__${item.filename}`}
-                                                        // style={{maxWidth: '100%', height: 'auto'}}
-                                                    />
+                                                    <Carousel arrows autoplay={{ dotDuration: true }} infinite={false}>
+                                                        <div>
+                                                        <Image
+                                                            src={`${httpUrl}/output/${item.filename.split('.')[0]}/redSpace/predict_redSpace__${item.filename}`}
+                                                            style={{height: '160px',}}
+                                                        />
+                                                        </div>
+                                                        <div>
+                                                        <Image
+                                                            src={`${httpUrl}/output/${item.filename.split('.')[0]}/redSpace/result_All_ID_0__${item.filename}`}
+                                                            style={{height: '160px',}}
+                                                        />
+                                                        </div>
+                                                        <div>
+                                                        <Image
+                                                            src={`${httpUrl}/output/${item.filename.split('.')[0]}/greenPoly/result_All_ID_0__${item.filename}`}
+                                                            style={{height: '160px',}}
+                                                        />
+                                                        </div>
+                                                        <div>
+                                                        <Image
+                                                            src={`${httpUrl}/output/${item.filename.split('.')[0]}/yellowRectangle/result_All_ID_0__${item.filename}`}
+                                                            style={{height: '160px',}}
+                                                        />
+                                                        </div>
+
+                                                    </Carousel>
                                                 </>
                                             }
 
