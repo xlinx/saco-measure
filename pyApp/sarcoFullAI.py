@@ -40,6 +40,8 @@ ALL_FORMAT=('*.png', '*.jpg','*.tif')
 ALL_FORMAT_STR='*.{png,jpg,tif}'
 DECADE_MODEL='redv1.pt'
 home = Path.home().joinpath('sarcoMeasure')
+activeCount=0
+loopCount=0
 
 class BColors:
     HEADER = '\033[95m'
@@ -87,7 +89,7 @@ for f in fNameX:
     f['pathStrX'] = home.joinpath(f['nameX']).absolute()
     if not os.path.exists(f['pathStrX']):
         os.makedirs(f['pathStrX'])
-    print('[IONIS][working-folder][init]', f['pathStrX'])
+    print('[IONIS][working-folder][init]', f['pathStrX'],end='\t')
 
 DECADE_MODEL_PATH=fNameX.modelAI['pathObjX'].joinpath(DECADE_MODEL)
 SOTA_ALL_VAR.inx = fNameX.output['pathStrX']
@@ -106,7 +108,17 @@ yolo_model = YOLO(model=fNameX.modelAI['pathObjX'].joinpath(DECADE_MODEL))
 print('[][DECADE.TW][ML-MODEL-INFO]',yolo_model.names)
 
 for each_file in fNameX.input['pathObjX'].glob('*.*'): # grabs all files
-    each_file.rename(fNameX.output['pathObjX'].joinpath(each_file.name)) # moves to parent folder.
+    if each_file.name.startswith("."):
+        continue
+    # if not os.path.exists(fNameX.output['pathObjX'].joinpath(each_file.):
+    #     os.makedirs(each_file)
+    # each_file.rename(fNameX.output['pathObjX'].joinpath(each_file.name)) # moves to parent folder.
+    folder_name = each_file.stem
+    folder_path = fNameX.output['pathObjX'].joinpath(folder_name)
+    if not folder_path.exists():
+        folder_path.mkdir(parents=True, exist_ok=True)
+    # Move the file into the new folder
+    each_file.rename(folder_path.joinpath(each_file.name)) # moves to its own folder in output
 
 def LIST_SOTA():
     for i in (vars(SOTA_ALL_VAR)):
@@ -118,11 +130,14 @@ def run_sota(ALL_VAR):
     print('[][][fullAI]')
 
 def directory_modified(dir_path, poll_timeout=1):
+    global loopCount
+    global activeCount
     init_mtime = os.stat(dir_path).st_mtime
     while True:
         now_mtime = os.stat(dir_path).st_mtime
         if init_mtime != now_mtime:
             init_mtime = now_mtime
+            activeCount+=1
             print(datetime.datetime.now(),"[1][decade.tw][monitor][different]input=",fNameX.input,", output=",fNameX.output)
             allImages = []
             for ext in ALL_FORMAT:
@@ -135,7 +150,8 @@ def directory_modified(dir_path, poll_timeout=1):
                 yolo_decade(None,imagepathObjX)
                 # os.remove(imagepathObjX)
         else:
-            print(datetime.datetime.now(),"[O][ionis][AI-Model-Level=medium][InputFolder][monitoring..]",BColors.WARNING ,fNameX.input['pathStrX'],BColors.ENDC)
+            loopCount+=1
+            print(datetime.datetime.now(),activeCount,loopCount,".",BColors.WARNING ,'.',BColors.ENDC)
 
         time.sleep(poll_timeout)
 def euclidean_distance(p1, p2):

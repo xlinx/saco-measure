@@ -74,10 +74,11 @@ export function GalleryX(props) {
 
     // Function to delete file
     const deleteFile = async (filename) => {
-        if (!confirm(`Are you sure you want to delete ${filename}?`)) return;
+        let delTarget=`${serverUrl}/delete-folder/${encodeURIComponent(filename)}`
+        if (!confirm(`${delTarget} Are you sure you want to delete folder ${delTarget} ?`)) return;
         
         try {
-            const response = await fetch(`${serverUrl}/delete-file/${encodeURIComponent(filename)}`, {
+            const response = await fetch(delTarget, {
                 method: 'DELETE'
             });
             const data = await response.json();

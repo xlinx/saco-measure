@@ -30,6 +30,7 @@ const app = express();
 const folder_home_sarcoMeasure = path.join(homedir(), 'sarcoMeasure');
 const folder_home_sarcoMeasure_input = path.join(folder_home_sarcoMeasure, 'input');
 const folder_home_sarcoMeasure_output = path.join(folder_home_sarcoMeasure, 'output');
+const folder_home_sarcoMeasure_processed = path.join(folder_home_sarcoMeasure, 'processed');
 const folder_home_sarcoMeasure_www = path.join(folder_home_sarcoMeasure, 'www');
 const folder_home_sarcoMeasure_upload = path.join(folder_home_sarcoMeasure, 'upload');
 const configFilePath = path.join(folder_home_sarcoMeasure_www, 'config.txt');
@@ -400,221 +401,7 @@ async function multerServer(port){
 
     // GET route to serve a file browser interface
     app.get('/file-browser', (req, res) => {
-        res.send(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Sarco File Browser</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-                    .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-                    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-                    .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-                    .search-box { padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 200px; }
-                    .sort-select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
-                    .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
-                    .file-card { border: 1px solid #ddd; border-radius: 8px; padding: 15px; background: #fafafa; }
-                    .file-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-                    .file-icon { font-size: 2em; margin-bottom: 10px; }
-                    .file-name { font-weight: bold; margin-bottom: 5px; word-break: break-all; }
-                    .file-info { font-size: 0.9em; color: #666; }
-                    .file-actions { margin-top: 10px; }
-                    .btn { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px; font-size: 0.8em; }
-                    .btn-primary { background: #007bff; color: white; }
-                    .btn-danger { background: #dc3545; color: white; }
-                    .btn:hover { opacity: 0.8; }
-                    .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
-                    .pagination button { padding: 8px 12px; border: 1px solid #ddd; background: white; cursor: pointer; }
-                    .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
-                    .stats { margin-bottom: 20px; padding: 10px; background: #e9ecef; border-radius: 4px; }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <div class="header">
-                        <h1>File Browser</h1>
-                        <div class="controls">
-                            <input type="text" id="search" class="search-box" placeholder="Search files...">
-                            <select id="sort" class="sort-select">
-                                <option value="modified">Modified Date</option>
-                                <option value="created">Created Date</option>
-                                <option value="name">Name</option>
-                                <option value="size">Size</option>
-                            </select>
-                            <select id="order" class="sort-select">
-                                <option value="desc">Descending</option>
-                                <option value="asc">Ascending</option>
-                            </select>
-                            <button onclick="loadFiles()" class="btn btn-primary">Refresh</button>
-                        </div>
-                    </div>
-                    
-                    <div class="stats" id="stats"></div>
-                    <div class="file-grid" id="fileGrid"></div>
-                    <div class="pagination" id="pagination"></div>
-                </div>
-
-                <script>
-                    let currentPage = 1;
-                    const filesPerPage = 12;
-
-                    function formatFileSize(bytes) {
-                        if (bytes === 0) return '0 Bytes';
-                        const k = 1024;
-                        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-                        const i = Math.floor(Math.log(bytes) / Math.log(k));
-                        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-                    }
-
-                    function formatDate(dateString) {
-                        return new Date(dateString).toLocaleString();
-                    }
-
-                    function getFileIcon(filename) {
-                        const ext = filename.split('.').pop().toLowerCase();
-                        if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) return '🖼️';
-                        if (['mp4', 'mov', 'avi', 'mkv'].includes(ext)) return '🎥';
-                        if (['pdf'].includes(ext)) return '📄';
-                        if (['doc', 'docx'].includes(ext)) return '📝';
-                        if (['txt'].includes(ext)) return '📄';
-                        return '📁';
-                    }
-
-                    async function loadFiles(page = 1) {
-                        const search = document.getElementById('search').value;
-                        const sort = document.getElementById('sort').value;
-                        const order = document.getElementById('order').value;
-                        
-                        try {
-                            const response = await fetch(\`/files?filter=\${search}&sort=\${sort}&order=\${order}&page=\${page}&limit=\${filesPerPage}\`);
-                            const data = await response.json();
-                            
-                            if (data.success) {
-                                displayFiles(data.files);
-                                displayPagination(data.pagination);
-                                displayStats(data.pagination);
-                                currentPage = page;
-                            } else {
-                                alert('Error loading files: ' + data.message);
-                            }
-                        } catch (error) {
-                            alert('Error loading files: ' + error.message);
-                        }
-                    }
-
-                    function displayFiles(files) {
-                        const grid = document.getElementById('fileGrid');
-                        grid.innerHTML = '';
-                        
-                        files.forEach(file => {
-                            const card = document.createElement('div');
-                            card.className = 'file-card';
-                            card.innerHTML = \`
-                                <div class="file-icon">\${getFileIcon(file.filename)}</div>
-                                \${file.isImage ? \`<img src="/uploads/\${file.filename}" style="max-width: 100%; height: auto; border-radius: 4px; margin-bottom: 10px;">\` : ''}
-                                <div class="file-name">\${file.filename}</div>
-                                <div class="file-info">
-                                    Size: \${file.sizeFormatted}<br>
-                                    Modified: \${formatDate(file.modified)}<br>
-                                    Type: \${file.extension || 'Unknown'}
-                                </div>
-                                <div class="file-actions">
-                                    <button onclick="downloadFile('\${file.filename}')" class="btn btn-primary">Download</button>
-                                    <button onclick="deleteFile('\${file.filename}')" class="btn btn-danger">Delete</button>
-                                </div>
-                            \`;
-                            grid.appendChild(card);
-                        });
-                    }
-
-                    function displayPagination(pagination) {
-                        const paginationDiv = document.getElementById('pagination');
-                        paginationDiv.innerHTML = '';
-                        
-                        if (pagination.totalPages <= 1) return;
-                        
-                        // Previous button
-                        const prevBtn = document.createElement('button');
-                        prevBtn.textContent = 'Previous';
-                        prevBtn.disabled = !pagination.hasPrevPage;
-                        prevBtn.onclick = () => loadFiles(currentPage - 1);
-                        paginationDiv.appendChild(prevBtn);
-                        
-                        // Page numbers
-                        for (let i = 1; i <= pagination.totalPages; i++) {
-                            if (i === 1 || i === pagination.totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
-                                const pageBtn = document.createElement('button');
-                                pageBtn.textContent = i;
-                                pageBtn.style.fontWeight = i === currentPage ? 'bold' : 'normal';
-                                pageBtn.onclick = () => loadFiles(i);
-                                paginationDiv.appendChild(pageBtn);
-                            } else if (i === currentPage - 3 || i === currentPage + 3) {
-                                const ellipsis = document.createElement('span');
-                                ellipsis.textContent = '...';
-                                ellipsis.style.padding = '8px 12px';
-                                paginationDiv.appendChild(ellipsis);
-                            }
-                        }
-                        
-                        // Next button
-                        const nextBtn = document.createElement('button');
-                        nextBtn.textContent = 'Next';
-                        nextBtn.disabled = !pagination.hasNextPage;
-                        nextBtn.onclick = () => loadFiles(currentPage + 1);
-                        paginationDiv.appendChild(nextBtn);
-                    }
-
-                    function displayStats(pagination) {
-                        const statsDiv = document.getElementById('stats');
-                        statsDiv.innerHTML = \`Showing \${pagination.filesPerPage} files per page. Total: \${pagination.totalFiles} files (\${pagination.totalPages} pages)\`;
-                    }
-
-                    function downloadFile(filename) {
-                        window.open(\`/uploads/\${filename}\`, '_blank');
-                    }
-
-                    async function deleteFile(filename) {
-                        if (!confirm('Are you sure you want to delete ' + filename + '?')) return;
-                        
-                        try {
-                            const response = await fetch(\`/delete-file/\${encodeURIComponent(filename)}\`, {
-                                method: 'DELETE'
-                            });
-                            const data = await response.json();
-                            
-                            if (data.success) {
-                                loadFiles(currentPage);
-                            } else {
-                                alert('Error deleting file: ' + data.message);
-                            }
-                        } catch (error) {
-                            alert('Error deleting file: ' + error.message);
-                        }
-                    }
-
-                    // Event listeners
-                    document.getElementById('search').addEventListener('input', debounce(() => loadFiles(1), 500));
-                    document.getElementById('sort').addEventListener('change', () => loadFiles(1));
-                    document.getElementById('order').addEventListener('change', () => loadFiles(1));
-
-                    function debounce(func, wait) {
-                        let timeout;
-                        return function executedFunction(...args) {
-                            const later = () => {
-                                clearTimeout(timeout);
-                                func(...args);
-                            };
-                            clearTimeout(timeout);
-                            timeout = setTimeout(later, wait);
-                        };
-                    }
-
-                    // Load files on page load
-                    loadFiles();
-                </script>
-            </body>
-            </html>
-        `);
+        res.sendFile(path.join(process.cwd(), 'fileBrowser.html'));
     });
 
     // GET route to preview CSV file content
@@ -695,12 +482,39 @@ async function multerServer(port){
             });
         }
     });
+    app.delete('/delete-folder/:foldername', (req, res) => {
 
+        try {
+            const filename = req.params.foldername;
+            const foldername = req.params.foldername.split('.')[0];
+            const filePath = path.join(folder_home_sarcoMeasure_output, foldername);
+            console.log('/delete-folder/:foldername',filePath)
+            if (!fs.existsSync(filePath)) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'File not found'
+                });
+            }
+            fs.unlinkSync(path.join(folder_home_sarcoMeasure_processed, filename));
+            fs.rmSync(filePath, { recursive: true, force: true });
+
+            // fs.rmdirSync(filePath);
+            res.json({
+                success: true,
+                message: 'folder deleted successfully'
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'Failed to delete folder: ' + error.message
+            });
+        }
+    });
     // DELETE route to delete a file
     app.delete('/delete-file/:filename', (req, res) => {
         try {
             const filename = req.params.filename;
-            const filePath = path.join(folder_home_sarcoMeasure_upload, filename);
+            const filePath = path.join(folder_home_sarcoMeasure_output, filename);
             
             if (!fs.existsSync(filePath)) {
                 return res.status(404).json({ 
