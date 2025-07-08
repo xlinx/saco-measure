@@ -233,7 +233,7 @@ def thread_safe_predict(_yolo_model, _image_path):
         which_class=_yolo_model.names[which_class_key]
 
 
-        confX=0.01
+        confX=0.1
         yolo_results=[]
         while len(yolo_results)==0 and confX > 0 :
             print('[][start-predict][0][trying conf]=', BColors.WARNING ,confX,BColors.ENDC, which_class)
@@ -358,7 +358,56 @@ def thread_safe_predict(_yolo_model, _image_path):
             df = pd.concat(list)
             df.to_csv(classFolder.joinpath('AI.' +which_class+ '.predict.box.csv'), index=False)
 
+            # --- Transparent box background plot ---
+            # Create a transparent image (RGBA)
+            orig_img = yolo_results[result_index].orig_img
+            h, w = orig_img.shape[:2]
+            transparent_img = np.zeros((h, w, 4), dtype=np.uint8)  # RGBA
 
+            # # Draw each box with transparency
+            # for box_index in range(len(boxes)):
+            #     box = boxes[box_index]
+            #     # xyxy format: [x1, y1, x2, y2]
+            #     x1, y1, x2, y2 = map(int, box.xyxy[0])
+            #     # Draw a semi-transparent rectangle (e.g., red with alpha)
+            #     overlay = transparent_img.copy()
+            #     color = (255, 0, 0, 80)  # Red, alpha=80/255
+            #     cv2.rectangle(overlay, (x1, y1), (x2, y2), color, thickness=1)
+            #     # Alpha blend the rectangle onto the transparent image
+            #     alpha = color[3] / 255.0
+            #     transparent_img = cv2.addWeighted(overlay, alpha, transparent_img, 1 - alpha, 0)
+            #     # Optionally, draw the box border (opaque)
+            #     cv2.rectangle(transparent_img, (x1, y1), (x2, y2), (255, 255, 255, 255), thickness=1)
+
+            # Draw keypoints (keypose points) on the composited image
+            for box_index in range(len(boxes)):
+                kp_xy = keypoints.xy.tolist()[box_index]
+                draw_lines_with_distAll(transparent_img, kp_xy)
+                for (x, y) in kp_xy:
+                    cv2.circle(transparent_img, (int(x), int(y)), radius=1, color=(255, 255, 255, 255), thickness=-1)  # Green dot
+
+            # Save the transparent image as PNG
+            transparent_box_filename = classFolder.joinpath(f'result_TransparentBox_ID_{result_index}__' + Path(_image_path).stem + '.png')
+            cv2.imwrite(str(transparent_box_filename), transparent_img)
+
+            # --- Composite transparent boxes over original image ---
+            # Convert original image to BGRA if needed
+            if orig_img.shape[2] == 3:
+                orig_img_bgra = cv2.cvtColor(orig_img, cv2.COLOR_BGR2BGRA)
+            else:
+                orig_img_bgra = orig_img.copy()
+            # Alpha blend the transparent boxes onto the original image
+            composite_img = orig_img_bgra.copy()
+            mask = transparent_img[:, :, 3] > 0
+            for c in range(3):
+                composite_img[:, :, c][mask] = (
+                    transparent_img[:, :, c][mask] * (transparent_img[:, :, 3][mask] / 255.0) +
+                    orig_img_bgra[:, :, c][mask] * (1 - transparent_img[:, :, 3][mask] / 255.0)
+                ).astype(np.uint8)
+
+        # Save the composited image
+            composite_box_filename = classFolder.joinpath(f'result_CompositeBox_ID_{result_index}__' + Path(_image_path).stem + '.png')
+            cv2.imwrite(str(composite_box_filename), composite_img)
 
 
         # for result_index in range(len(yolo_results)):
