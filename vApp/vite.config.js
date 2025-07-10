@@ -2,15 +2,24 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 import path from "path";
+import fs from "fs";
+
+const key = fs.readFileSync(path.resolve(__dirname, '../cert/key.pem'));
+const cert = fs.readFileSync(path.resolve(__dirname, '../cert/cert.pem'));
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  server:{
+  server: {
     disableHostCheck: true,
     port: 8888,
     open: false,
-    host:"0.0.0.0",
-    allowedHosts:['o4.decade.tw','xpro.local','localhost','xpro','xmax'],
+    host: "0.0.0.0",
+    allowedHosts: ['o4.decade.tw', 'xpro.local', 'localhost', 'xpro', 'xmax'],
+    https: {
+      key,
+      cert,
+    },
     proxy: {
       '/__vite_dev_proxy_1_': {
         changeOrigin: true,

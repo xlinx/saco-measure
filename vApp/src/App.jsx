@@ -124,7 +124,7 @@ function App() {
     const HeaderCenter = () => {
         return (
             <span style={{ fontWeight: 'bold', fontSize: '20px', padding: '0px', margin: '0px' }}>
-                Sarco Measure Center
+                Sarco Measure Center v.0710
             </span>
         )
     }

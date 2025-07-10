@@ -20,6 +20,11 @@ import * as path from "node:path";
 import * as http from 'http';
 import * as url from "node:url";
 import archiver from "archiver";
+import https from 'https';
+
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 
 let auto_update=false;
@@ -31,13 +36,17 @@ const folder_home_sarcoMeasure = path.join(homedir(), 'sarcoMeasure');
 const folder_home_sarcoMeasure_input = path.join(folder_home_sarcoMeasure, 'input');
 const folder_home_sarcoMeasure_output = path.join(folder_home_sarcoMeasure, 'output');
 const folder_home_sarcoMeasure_processed = path.join(folder_home_sarcoMeasure, 'processed');
-const folder_home_sarcoMeasure_www = path.join(folder_home_sarcoMeasure, 'www');
 const folder_home_sarcoMeasure_upload = path.join(folder_home_sarcoMeasure, 'upload');
+const folder_home_sarcoMeasure_dist = path.join(__dirname, 'dist');
+const folder_home_sarcoMeasure_www = path.join(folder_home_sarcoMeasure, 'www');
 const configFilePath = path.join(folder_home_sarcoMeasure_www, 'config.txt');
 
 let last_CMD = "";
 let CMD_QUEUE = []
-
+const sslOptions = {//openssl req -nodes -new -x509 -keyout cert/key.pem -out cert/cert.pem -days 365
+    key: fs.readFileSync(path.join(__dirname, 'cert', 'key.pem')),
+    cert: fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem'))
+  };
 const directories = [
     folder_home_sarcoMeasure,
     folder_home_sarcoMeasure_www,
@@ -111,8 +120,8 @@ async function multerServer(port){
     const upload = multer({ 
         storage: storage,
         limits: {
-            fileSize: 50 * 1024 * 1024, // 50MB limit
-            files: 10 // Max 10 files
+            fileSize: 10 * 1024 * 1024, // 50MB limit
+            files: 2 // Max 10 files
         },
         fileFilter: function (req, file, cb) {
             // Accept images, videos, and common file types
@@ -131,21 +140,21 @@ async function multerServer(port){
     // CORS middleware to handle cross-origin requests
     app.use((req, res, next) => {
         // Allow specific origins or use '*' for development
-        const allowedOrigins = [
-            'http://localhost:5173',  // Vite dev server
-            'http://localhost:3000',  // React dev server
-            'http://localhost:8080',  // Vue dev server
-            'http://127.0.0.1:5173',
-            'http://127.0.0.1:3000',
-            'http://127.0.0.1:8080'
-        ];
+        // const allowedOrigins = [
+        //     'http://localhost:5173',  // Vite dev server
+        //     'http://localhost:3000',  // React dev server
+        //     'http://localhost:8080',  // Vue dev server
+        //     'http://127.0.0.1:5173',
+        //     'http://127.0.0.1:3000',
+        //     'http://127.0.0.1:8080'
+        // ];
         
-        const origin = req.headers.origin;
-        if (allowedOrigins.includes(origin)) {
-            res.header('Access-Control-Allow-Origin', origin);
-        } else {
-            res.header('Access-Control-Allow-Origin', '*');
-        }
+        // const origin = req.headers.origin;
+        // if (allowedOrigins.includes(origin)) {
+        //     res.header('Access-Control-Allow-Origin', origin);
+        // } else {
+        res.header('Access-Control-Allow-Origin', '*');
+        // }
         
         res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
         res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
@@ -160,6 +169,8 @@ async function multerServer(port){
     });
 
     // Middleware for parsing JSON and URL-encoded bodies
+
+
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 
@@ -175,7 +186,11 @@ async function multerServer(port){
 
     // Serve static files
     app.use(express.static(folder_home_sarcoMeasure_www));
+    app.use('/input', express.static(folder_home_sarcoMeasure_input));
+    app.use('/output', express.static(folder_home_sarcoMeasure_output));
+    app.use('/processed', express.static(folder_home_sarcoMeasure_processed));
     app.use('/uploads', express.static(folder_home_sarcoMeasure_upload));
+    app.use('/', express.static(folder_home_sarcoMeasure_dist));
 
     // GET route to serve upload form
     app.get('/upload-form', (req, res) => {
@@ -575,29 +590,31 @@ async function multerServer(port){
         });
     });
 
+    // Start HTTPS server
     return new Promise((resolve, reject) => {
-        const server = app.listen(port, () => {
-            console.log(`multerServer listening at port:${port}`);
-            console.log(`CORS test endpoint: http://localhost:${port}/test-cors`);
-            console.log(`Upload form available at: http://localhost:${port}/upload-form`);
-            console.log(`File browser available at: http://localhost:${port}/file-browser`);
-            console.log(`Upload endpoint: http://localhost:${port}/upload`);
-            console.log(`Multiple upload endpoint: http://localhost:${port}/upload-multiple`);
-            console.log(`Files list endpoint: http://localhost:${port}/files`);
-            console.log(`CSV preview endpoint: http://localhost:${port}/preview-csv/:filename`);
+        const expressServer = https.createServer(sslOptions, app);
+        expressServer.listen(port, () => {
+            console.log(`multerServer (HTTPS) listening at port:${port}`);
+            console.log(`CORS test endpoint: https://localhost:${port}/test-cors`);
+            console.log(`Upload form available at: https://localhost:${port}/upload-form`);
+            console.log(`File browser available at: https://localhost:${port}/file-browser`);
+            console.log(`Upload endpoint: https://localhost:${port}/upload`);
+            console.log(`Multiple upload endpoint: https://localhost:${port}/upload-multiple`);
+            console.log(`Files list endpoint: https://localhost:${port}/files`);
+            console.log(`CSV preview endpoint: https://localhost:${port}/preview-csv/:filename`);
             console.log(`CORS enabled for: localhost:5173, localhost:3000, localhost:8080`);
-            resolve(server);
+            resolve(expressServer);
         });
-        
-        server.on('error', (error) => {
-            console.error('multerServer error:', error);
+        expressServer.on('error', (error) => {
+            console.error('multerServer HTTPS error:', error);
             reject(error);
         });
     });
 }
 async function httpServer(port){
 
-    http.createServer(function (req, res) {
+    // http.createServer(function (req, res) {
+        https.createServer(sslOptions, function (req, res) {
         console.log(`${req.method} ${req.url}`);
         const parsedUrl = url.parse(req.url);
         // extract URL path
@@ -857,6 +874,15 @@ function timerX() {
 
 let lLOADED = false;
 export function initServer() {
+    let multerServer_port=7777
+    let WSS_PORT = multerServer_port+1;
+    process.argv.forEach((index, value) => {
+        console.log('[][cmd_var][]', index, value)
+        if(index===2)
+            multerServer_port=parseInt(value)
+        else if(index===3)
+            WSS_PORT=parseInt(value)
+    });
 
     if (lLOADED) {
         console.log("[ProxyJS][IN-Call][initServer]has been loaded")
@@ -869,16 +895,16 @@ export function initServer() {
 
     console.log(`[][][initServer][1]...startLoading`)
 
-    httpServer(20080).then(r => {
-        console.log('[][][DECADE-httpServer-Module][3]server listening ',20080);
+    // httpServer(20080).then(r => {
+    //     console.log('[][][DECADE-httpServer-Module][3]server listening ',20080);
+    // });
+    multerServer(multerServer_port).then(r => {
+        console.log('[][][DECADE-httpServer-Module][3]multerServer listening ',multerServer_port);
     });
-    multerServer(20021).then(r => {
-        console.log('[][][DECADE-httpServer-Module][3]multerServer listening ',20021);
-    });
 
 
 
-    let WSS_PORT = 20081;
+
     initWSS(WSS_PORT).then(r => {
         console.log('[][][DECADE-WSS-Module][3]server listening ', WSS_PORT);
     });
@@ -905,5 +931,5 @@ else {
     console.log("[ProxyJS][base-Call][initServer]start loading")
     initServer();
 }
-console.log("[ProxyJS][2][initServer]",useStoreS)
+console.log("20250710[sarcoProxyJS][2][initServer]",useStoreS)
 // export default initServer

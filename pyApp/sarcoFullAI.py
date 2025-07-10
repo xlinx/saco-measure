@@ -233,7 +233,7 @@ def thread_safe_predict(_yolo_model, _image_path):
         which_class=_yolo_model.names[which_class_key]
 
 
-        confX=0.1
+        confX=0.01
         yolo_results=[]
         while len(yolo_results)==0 and confX > 0 :
             print('[][start-predict][0][trying conf]=', BColors.WARNING ,confX,BColors.ENDC, which_class)

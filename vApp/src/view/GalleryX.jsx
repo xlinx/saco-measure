@@ -17,8 +17,8 @@ export function GalleryX(props) {
     const [searchText, setSearchText] = useState('');
 
     const host = window.location.hostname;
-    const serverUrl = `http://${host}:20021`; // Express server URL
-    const httpUrl = `http://${host}:20080`;
+    const serverUrl = `${window.location.protocol}//${host}`; // Express server URL
+    const httpUrl = `${window.location.protocol}//${host}`;
     // Function to get file icon based on extension or directory
     const getFileIcon = (item) => {
         if (item.isDirectory) return <FolderOpenOutlined style={{color: '#faad14'}} />;
@@ -33,6 +33,7 @@ export function GalleryX(props) {
     // Function to fetch files from Express server
     const fetchFiles = async () => {
         try {
+            console.log('window.location.protocol=',window.location.protocol)
             // setLoading(true);
             const response = await fetch(`${serverUrl}/files?foldername=${folderName}&filter=${searchText}&sort=modified&order=desc`);
             const data = await response.json();

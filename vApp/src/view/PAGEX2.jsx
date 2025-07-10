@@ -64,8 +64,8 @@ const StaticHTML = () => {
                                     // });
                                     Flmngr.open({
                                         apiKey: "wItxl0ctkVVg44EonzgNnMhP",
-                                        urlFileManager: 'http://' + window.location.hostname + ':3128/fm', // demo server
-                                        urlFiles: 'http://' + window.location.hostname + ':3128/ftp',
+                                        urlFileManager: window.location.protocol+'//' + window.location.hostname + ':3128/fm', // demo server
+                                        urlFiles: window.location.protocol+'//' + window.location.hostname + ':3128/ftp',
                                         isMultiple: false,                                   // let selecting a single file
                                         acceptExtensions: ["png", "jpg", "jpeg", "tif", "tiff", "webp"],
                                         onFinish: (files) => {

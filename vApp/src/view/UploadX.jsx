@@ -11,7 +11,7 @@ const getBase64 = (file) =>
     });
 
 export const UploadX = () => {
-    const uploadURL=`http://${window.location.hostname}:20021/upload`
+    const uploadURL=`${window.location.protocol}//${window.location.hostname}/upload`
     // console.log('uploadURL',uploadURL)
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');

@@ -5,13 +5,21 @@
   "type": "module",
   "scripts": {
     "v_dev": "vite",
-    "v_build": "vite build && npm run scp_o4 && npm run scp_o4_pyApp",
+    "v_build": "vite build",
+    "v_build_cloud": "vite build && npm run scp_o4 && npm run scp_o4_pyApp",
     "v_lint": "eslint .",
     "v_preview": "vite preview",
     "scp_o4": "rsync -avzh -e 'ssh -p 22' --progress --delete --exclude 'node_modules' dist/* ubuntu@o4.decade.tw:/var/www/node/sarco/",
     "scp_o4_pyApp": "rsync -avzh -e 'ssh -p 22' --progress --delete --exclude 'node_modules' ../pyApp/* ubuntu@o4.decade.tw:/var/www/node/sarco_pyApp/",
     "scp_o4_pyApp_userfolder": "rsync -avzh -e 'ssh -p 22' --progress --delete --exclude 'node_modules' ~/sarcoMeasure/* ubuntu@o4.decade.tw:~/sarcoMeasure/",
-    "scp_o4_proxy": "rsync -avzh -e 'ssh -p 22' --progress --delete --exclude 'node_modules' ../proxyApp/* ubuntu@o4.decade.tw:/var/www/node/sarco_proxyApp/"
+    "scp_o4_proxy": "rsync -avzh -e 'ssh -p 22' --progress --delete --exclude 'dist' --exclude 'node_modules' ../proxyApp/* ubuntu@o4.decade.tw:/var/www/node/sarco_proxyApp/"
+  },
+  "pm2": {
+    "http": "pm2 start http-server --name sarco -- /var/www/node/sarco/ --cors=* -p 7777 -d false",
+    "https": "pm2 start http-server --name sarco -- /var/www/node/sarco/ -S -C /var/www/node/sarco_proxyApp/cert/cert.pem -K /var/www/node/sarco_proxyApp/cert/key.pem --cors=* -p 7777 -d false",
+    "socat": "sudo socat openssl-listen:443,reuseaddr,key=/var/www/node/sarco_proxyApp/cert/key.pem,cert=/var/www/node/sarco_proxyApp/cert/cert.pem,fork TCP:localhost:7777",
+    "socat443": "sudo socat tcp-listen:80,reuseaddr,fork TCP:localhost:7777",
+    "py_AI": "pm2 start /var/www/node/sarco_pyApp/sarcoFullAI.py --interpreter /var/www/node/sarco_pyApp/venv/bin/python3"
   },
   "dependencies": {
     "@ant-design/icons": "^5.6.1",
