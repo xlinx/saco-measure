@@ -135,7 +135,7 @@ export function GalleryX(props) {
             });
         }, (Math.random()*2000)+2000)
         return () => {
-            clearInterval(ws_timer1000)
+            clearInterval(ws_timer2000)
         }
     }, [])
     // useEffect(() => {
