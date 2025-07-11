@@ -56,7 +56,7 @@ const StaticHTML = () => {
                                 title: (
                                     <>
                                         <UserOutlined />
-                                        <span>Work</span>
+                                        <span>Ying-Chang Hsueh</span>
                                     </>
                                 ),
                             },

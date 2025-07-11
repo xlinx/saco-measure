@@ -4,9 +4,9 @@ import './App.css'
 import './App.css'
 import {
     Col,
-    ConfigProvider, Image,
+    ConfigProvider, Flex, Image,
     Layout,
-    Row,
+    Row, Space,
     Tabs,
     Tag,
     theme
@@ -119,7 +119,7 @@ function App() {
     const HeaderLeft = () => {
         return (
             <Image
-            style={{maxHeight: '200px',minHeight:'130px'}}
+            style={{maxHeight: '200px',minHeight:'140px'}}
                 src={sacoSvgLogo3} className=" logo-spin "/>
         )
     }
@@ -133,23 +133,38 @@ function App() {
 
     const HeaderRight = (s1) => {
 
-        return (<>
+        return (<Flex gap="3px" align="flex-start" justify="flex-start" vertical
+                      style={{ margin: '10px 10px 0 0', padding: '0px 10px 0 0', alignItems: 'right' }}
+            >
 
-                    <Tag color="blue" style={{ fontSize: '14px' }}>
+                    <Tag color="blue" style={{ fontSize: '1em' }}>
                         <AlertFilled style={{
                             animation: s1 ? 'specialFade 2s forwards ease' : 'specialFadeRed 4s forwards ease'
 
                         }} />
-                        &nbsp; AI
+                        &nbsp; httpService/AI
                         <SwapOutlined style={{
                             // "-webkit-transform": scale(-1,1),
                             transform: s1 ? 'scale(-1,1)' : 'scale(1,1)',
                             color: s1 ? '#fff' : '#fff'
                         }} />
-                        &nbsp;Server&nbsp;{RX_TS}
+                        &nbsp;{RX_TS.replaceAll('2025-','')}
                     </Tag>
+                <Tag color="blue" style={{ fontSize: '1em' }}>
+                    <AlertFilled style={{
+                        animation: s1 ? 'specialFade 2s forwards ease' : 'specialFadeRed 4s forwards ease'
 
-            </>
+                    }} />
+                    &nbsp; python/AI
+                    <SwapOutlined style={{
+                        // "-webkit-transform": scale(-1,1),
+                        transform: s1 ? 'scale(-1,1)' : 'scale(1,1)',
+                        color: s1 ? '#fff' : '#fff'
+                    }} />
+                    &nbsp;{RX_TS.replaceAll('2025-','')}
+                </Tag>
+
+            </Flex>
         )
     }
     const { styles } = useStyle();

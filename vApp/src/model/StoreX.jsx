@@ -29,8 +29,14 @@ export const useStoreX = create((set, get) => ({
     APP_IPS:["0.0.0.0"],
     UDP_PORT:62202,
     TCP_PORT:62203,
+
     RX_TS: '',
-    EXPRESS_REPONSE_200:false,
+    setRX_TS:(by) => set(() => ({RX_TS:  by})),
+    setVictoriaVOICE:(by) => set(() => ({VictoriaVOICE:  by})),
+
+    EXPRESS_REPONSE:false,
+    t_EXPRESS_REPONSE_200: () => set((state) => ({ EXPRESS_REPONSE_200: !state.EXPRESS_REPONSE_200  })),
+    s_EXPRESS_REPONSE_200:(by) => set((state) => ({EXPRESS_REPONSE_200:  by})),
     TX_JSON: {WHO: "WSC", CMD: "DECADE.TW",TS:''},
     RX_JSON:{},
 

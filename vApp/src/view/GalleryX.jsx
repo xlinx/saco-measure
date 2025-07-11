@@ -16,13 +16,21 @@ import {
     Flex
 } from 'antd';
 import {UploadX} from "./UploadX.jsx";
-import {FileTextOutlined, PictureOutlined, FileExcelOutlined, FilePdfOutlined, FolderOpenOutlined, DownloadOutlined} from '@ant-design/icons';
+import {
+    FileTextOutlined,
+    PictureOutlined,
+    FileExcelOutlined,
+    FilePdfOutlined,
+    FolderOpenOutlined,
+    DownloadOutlined,
+    SyncOutlined
+} from '@ant-design/icons';
 
 import * as path from "path";
 import {useStoreX} from "../model/StoreX.jsx";
 
 export function GalleryX(props) {
-    const {EXPRESS_REPONSE_200}=useStoreX();
+    const {setRX_TS,EXPRESS_REPONSE_200,t_EXPRESS_REPONSE_200}=useStoreX();
     const [filter, setfilter] = useState(props.filter);
     const [folderName, setFolderName] = useState(props.folderName);
     const [loading, setLoading] = useState(false);
@@ -34,7 +42,7 @@ export function GalleryX(props) {
     const [searchText, setSearchText] = useState('');
 
     const hostname = window.location.hostname;
-    let expressUrl = window.location.protocol+"//"+hostname+(hostname.startsWith('192')?":7777":"");
+    let expressUrl = window.location.protocol+"//"+hostname+(hostname.startsWith('192')||hostname.startsWith('local')?":7777":"");
     let expressHttpUrl = expressUrl;
     // Function to get file icon based on extension or directory
     const getFileIcon = (item) => {
@@ -50,28 +58,35 @@ export function GalleryX(props) {
     // Function to fetch files from Express server
     const fetchFiles = async () => {
         try {
-            console.log('window.location.protocol=',window.location.protocol)
+            // console.log('window.location.protocol=',window.location.protocol)
             // setLoading(true);
             const response = await fetch(`${expressUrl}/files?foldername=${folderName}&filter=${searchText}&sort=modified&order=desc`);
 
             const data = await response.json();
             
             if (data.success) {
-                setDataSource(data.files);
+                setDataSource(data.files.filter(item => !item.filename.startsWith('.')));
+
+
+
             } else {
                 console.error('Failed to fetch files:', data.message);
             }
+            return data
         } catch (error) {
             console.error('Error fetching files:', error);
         } finally {
             setLoading(false);
         }
+
     };
 
     // Function to preview CSV file
     const previewCsv = async (filename) => {
         try {
             const response = await fetch(`${expressUrl}/preview-csv/${encodeURIComponent(filename)}`);
+            console.log(response);
+
             const data = await response.json();
             
             if (data.success) {
@@ -103,7 +118,7 @@ export function GalleryX(props) {
             const data = await response.json();
             
             if (data.success) {
-                fetchFiles(); // Refresh the list
+                await fetchFiles(); // Refresh the list
             } else {
                 console.error('Failed to delete file:', data.message);
             }
@@ -111,14 +126,26 @@ export function GalleryX(props) {
             console.error('Error deleting file:', error);
         }
     };
-
     useEffect(() => {
-        fetchFiles().then(r => {
-
-        });
-        const intervalId = setInterval(fetchFiles, 2000); // Refresh every 2 seconds
-        return () => clearInterval(intervalId);
-    }, [searchText]);
+        const ws_timer2000 = setInterval(() => {
+            fetchFiles().then(r => {
+                // t_EXPRESS_REPONSE_200();
+                setRX_TS(r.TS)
+                // console.log(new Date(),'fetchFiles().then',EXPRESS_REPONSE_200,r);
+            });
+        }, (Math.random()*2000)+2000)
+        return () => {
+            clearInterval(ws_timer1000)
+        }
+    }, [])
+    // useEffect(() => {
+    //     fetchFiles().then(r => {
+    //         toggle_EXPRESS_REPONSE_200();
+    //         console.log('fetchFiles().then',EXPRESS_REPONSE_200,r);
+    //     });
+    //     const intervalId = setInterval(fetchFiles, 2000); // Refresh every 2 seconds
+    //     return () => clearInterval(intervalId);
+    // }, [searchText]);
 
     // CSV table columns for preview
     const csvColumns = csvData?.headers.map(header => ({
@@ -154,15 +181,37 @@ export function GalleryX(props) {
 
             <div
                 // style={{width: '100%'}}
-                direction='horizontal'>
+                >
                 {props.upload === true ? <UploadX></UploadX> : null}
                 
                 <List
                     loading={loading}
                     // dataSource={dataSource}
-                    dataSource={dataSource.filter(item => !item.filename.startsWith('.'))}
-                    grid={{xs: 1, sm: 2, md: 3, lg: 3, xl: 4, xxl: 4}}
-                    // style={{width:'100%'}}
+                    itemLayout="vertical"
+                    // size="small"
+                    // position={'top'}
+                    pagination={{
+                        onChange: page => {
+                            console.log(page);
+                        },
+                        pageSize: 10,
+                    }}
+                    dataSource={dataSource}
+                    // header={
+                    //     <div>
+                    //
+                    //     </div>
+                    // }
+                    footer={
+                        <div>
+                            {folderName === 'processed' ? <>
+                                <Tag  icon={<SyncOutlined spin />} color="warning">Every Processing...(wait AI 2-6secs)</Tag>
+                                <Tag> FolderCount={dataSource.length}</Tag>
+                            </>:<></>}
+                        </div>
+                    }
+                    grid={{gutter:3,xs: 1, sm: 2, md: 3, lg: 3, xl: 4, xxl: 4}}
+                    // style={{gap:'5px'}}
                     renderItem={(item) => {
                         const isImage = item.isImage;
                         const isCsv = item.extension === '.csv';
@@ -170,15 +219,14 @@ export function GalleryX(props) {
                         const isDirectory = item.isDirectory;
                         
                         return (
+                            <List.Item>
                             <Card
                                 key={item.filename}
                                 title={
-                                    <div
-                                        // style={{display: 'flex', alignItems: 'center', gap: 8}}
-                                    >
+                                    <>
                                         {getFileIcon(item)} &nbsp;
                                         <span style={{fontSize: '1em'}}>{item.filename}</span>
-                                    </div>
+                                    </>
                                 }
                                 // style={{width:'100%',margin: 12}}
                                 hoverable
@@ -230,44 +278,7 @@ export function GalleryX(props) {
                                                     Directory
                                                 </div>
                                             </div>
-                                            {/*{filter !== 'csv' ?<>*/}
-                                            {/*    <FolderOpenOutlined style={{fontSize: '48px'}} />*/}
-                                            {/*<div style={{marginTop: '8px'}}>*/}
-                                            {/*    <Tag color="gold">FOLDER</Tag>*/}
-                                            {/*    <div style={{fontSize: '12px', color: '#666'}}>*/}
-                                            {/*        Directory*/}
-                                            {/*    </div>*/}
-                                            {/*</div></>*/}
-                                            {/*:<>*/}
-                                            {/*    <div onClick={() => previewCsv(item.filename)}>*/}
-                                            {/*        <FileExcelOutlined style={{fontSize: '48px', color: '#52c41a'}} />*/}
-                                            {/*        <div style={{marginTop: '8px'}}>*/}
-                                            {/*            <Tag color="green">CSV</Tag>*/}
-                                            {/*            <div style={{fontSize: '12px', color: '#666'}}>*/}
-                                            {/*                Click to preview*/}
-                                            {/*            </div>*/}
-                                            {/*        </div>*/}
-                                            {/*    </div>*/}
-                                            {/*    <div onClick={() => previewCsv(item.filename)}>*/}
-                                            {/*        <FileExcelOutlined style={{fontSize: '48px', color: '#52c41a'}} />*/}
-                                            {/*        <div style={{marginTop: '8px'}}>*/}
-                                            {/*            <Tag color="green">CSV</Tag>*/}
-                                            {/*            <div style={{fontSize: '12px', color: '#666'}}>*/}
-                                            {/*                Click to preview*/}
-                                            {/*            </div>*/}
-                                            {/*        </div>*/}
-                                            {/*    </div>*/}
-                                            {/*    <div onClick={() => previewCsv(item.filename)}>*/}
-                                            {/*        <FileExcelOutlined style={{fontSize: '48px', color: '#52c41a'}} />*/}
-                                            {/*        <div style={{marginTop: '8px'}}>*/}
-                                            {/*            <Tag color="green">CSV</Tag>*/}
-                                            {/*            <div style={{fontSize: '12px', color: '#666'}}>*/}
-                                            {/*                Click to preview*/}
-                                            {/*            </div>*/}
-                                            {/*        </div>*/}
-                                            {/*    </div>*/}
-                                            {/*    </>*/}
-                                            {/*}*/}
+
                                         </div>
                                     ) : isImage ? (
                                         <>
@@ -379,6 +390,7 @@ export function GalleryX(props) {
                                     </div>
                                 </div>
                             </Card>
+                            </List.Item>
                         );
                     }} 
                 />
