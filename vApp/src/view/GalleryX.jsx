@@ -1,5 +1,20 @@
 import React, {useEffect, useState} from 'react';
-import {Card, Divider, Image, Input, List, Space, Typography, Modal, Table, Button, Tag, Tooltip, Carousel} from 'antd';
+import {
+    Card,
+    Divider,
+    Image,
+    Input,
+    List,
+    Space,
+    Typography,
+    Modal,
+    Table,
+    Button,
+    Tag,
+    Tooltip,
+    Carousel,
+    Flex
+} from 'antd';
 import {UploadX} from "./UploadX.jsx";
 import {FileTextOutlined, PictureOutlined, FileExcelOutlined, FilePdfOutlined, FolderOpenOutlined, DownloadOutlined} from '@ant-design/icons';
 
@@ -16,9 +31,9 @@ export function GalleryX(props) {
     const [selectedFile, setSelectedFile] = useState(null);
     const [searchText, setSearchText] = useState('');
 
-    const host = window.location.hostname;
-    const serverUrl = `${window.location.protocol}//${host}`; // Express server URL
-    const httpUrl = `${window.location.protocol}//${host}`;
+    const hostname = window.location.hostname;
+    let expressUrl = window.location.protocol+"//"+hostname+(hostname.startsWith('192')?":7777":"");
+    let expressHttpUrl = expressUrl;
     // Function to get file icon based on extension or directory
     const getFileIcon = (item) => {
         if (item.isDirectory) return <FolderOpenOutlined style={{color: '#faad14'}} />;
@@ -35,7 +50,7 @@ export function GalleryX(props) {
         try {
             console.log('window.location.protocol=',window.location.protocol)
             // setLoading(true);
-            const response = await fetch(`${serverUrl}/files?foldername=${folderName}&filter=${searchText}&sort=modified&order=desc`);
+            const response = await fetch(`${expressUrl}/files?foldername=${folderName}&filter=${searchText}&sort=modified&order=desc`);
             const data = await response.json();
             
             if (data.success) {
@@ -53,7 +68,7 @@ export function GalleryX(props) {
     // Function to preview CSV file
     const previewCsv = async (filename) => {
         try {
-            const response = await fetch(`${serverUrl}/preview-csv/${encodeURIComponent(filename)}`);
+            const response = await fetch(`${expressUrl}/preview-csv/${encodeURIComponent(filename)}`);
             const data = await response.json();
             
             if (data.success) {
@@ -70,12 +85,12 @@ export function GalleryX(props) {
 
     // Function to download file
     const downloadFile = (filename) => {
-        window.open(`${serverUrl}/${folderName}/${filename}`, '_blank');
+        window.open(`${expressUrl}/${folderName}/${filename}`, '_blank');
     };
 
     // Function to delete file
     const deleteFile = async (filename) => {
-        let delTarget=`${serverUrl}/delete-folder/${encodeURIComponent(filename)}`
+        let delTarget=`${expressUrl}/delete-folder/${encodeURIComponent(filename)}`
         if (!confirm(`${delTarget} Are you sure you want to delete folder ${delTarget} ?`)) return;
         
         try {
@@ -124,17 +139,19 @@ export function GalleryX(props) {
     };
     return (
         <div>
-            <Divider style={{fontSize:'1em',borderColor: '#7cb305'}} >
+            <Divider dashed={true} style={{fontSize:'1em',borderColor: '#575757'}} >
                 <Input.Search
-                    addonBefore={`folder=${folderName}`}
-                    style={{width: '100%', maxWidth: 500}}
+                    addonBefore={`${folderName}`}
+                    style={{width: '100%'}}
                     placeholder={`Search in ${folderName}`}
                     onSearch={(value) => setSearchText(value)}
                     onChange={(e) => setSearchText(e.target.value)}
                 />
             </Divider>
 
-            <Space direction='horizontal'>
+            <div
+                // style={{width: '100%'}}
+                direction='horizontal'>
                 {props.upload === true ? <UploadX></UploadX> : null}
                 
                 <List
@@ -142,7 +159,7 @@ export function GalleryX(props) {
                     // dataSource={dataSource}
                     dataSource={dataSource.filter(item => !item.filename.startsWith('.'))}
                     grid={{xs: 1, sm: 2, md: 3, lg: 3, xl: 4, xxl: 4}}
-                    style={{width:'100%'}}
+                    // style={{width:'100%'}}
                     renderItem={(item) => {
                         const isImage = item.isImage;
                         const isCsv = item.extension === '.csv';
@@ -153,12 +170,14 @@ export function GalleryX(props) {
                             <Card
                                 key={item.filename}
                                 title={
-                                    <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
-                                        {getFileIcon(item)}
-                                        <span style={{fontSize: '18px'}}>{item.filename}</span>
+                                    <div
+                                        // style={{display: 'flex', alignItems: 'center', gap: 8}}
+                                    >
+                                        {getFileIcon(item)} &nbsp;
+                                        <span style={{fontSize: '1em'}}>{item.filename}</span>
                                     </div>
                                 }
-                                style={{width:'100%',margin: 12}}
+                                // style={{width:'100%',margin: 12}}
                                 hoverable
                                 actions={
                                     isDirectory ? [
@@ -168,7 +187,7 @@ export function GalleryX(props) {
                                                 type="text"
                                                 size="small"
                                                 icon={<DownloadOutlined />}
-                                                onClick={() => window.open(`${serverUrl}/download-zip/${item.filename}`, '_blank')}
+                                                onClick={() => window.open(`${expressUrl}/download-zip/${item.filename}`, '_blank')}
                                             >
                                                 Download ZIP
                                             </Button>
@@ -250,43 +269,50 @@ export function GalleryX(props) {
                                     ) : isImage ? (
                                         <>
                                         <Image
-                                            src={`${httpUrl}/${folderName}/${item.filename}`}
+                                            src={`${expressHttpUrl}/${folderName}/${item.filename}`}
                                             alt={item.filename}
-                                            style={{maxWidth: '100%', height: 'auto'}}
+                                            // style={{maxWidth: '100vw', height: 'auto'}}
                                             preview={{
-                                                src: `${httpUrl}/${folderName}/${item.filename}`
+                                                src: `${expressHttpUrl}/${folderName}/${item.filename}`
                                             }}
+
                                         />
                                             {folderName !== 'processed' ?<></>:
-                                                <>
-                                                    <Carousel arrows autoplay={{ dotDuration: true }} infinite={false}>
+                                                <div
+                                                    // style={{ height: '160px' }}
+                                                >
+                                                    <Carousel
+                                                        // style={{ height: '160px' }}
+                                                        arrows autoplay={{ dotDuration: true }}
+                                                        infinite={false}
+                                                    >
                                                         <div>
                                                         <Image
-                                                            src={`${httpUrl}/output/${item.filename.split('.')[0]}/redSpace/predict_redSpace__${item.filename}`}
+                                                            src={`${expressHttpUrl}/output/${item.filename.split('.')[0]}/redSpace/predict_redSpace__${item.filename}`}
                                                             style={{height: '160px',}}
                                                         />
                                                         </div>
                                                         <div>
                                                         <Image
-                                                            src={`${httpUrl}/output/${item.filename.split('.')[0]}/redSpace/result_All_ID_0__${item.filename}`}
+                                                            src={`${expressHttpUrl}/output/${item.filename.split('.')[0]}/redSpace/result_All_ID_0__${item.filename}`}
                                                             style={{height: '160px',}}
                                                         />
                                                         </div>
                                                         <div>
                                                         <Image
-                                                            src={`${httpUrl}/output/${item.filename.split('.')[0]}/greenPoly/result_All_ID_0__${item.filename}`}
+                                                            src={`${expressHttpUrl}/output/${item.filename.split('.')[0]}/greenPoly/result_All_ID_0__${item.filename}`}
                                                             style={{height: '160px',}}
                                                         />
                                                         </div>
                                                         <div>
                                                         <Image
-                                                            src={`${httpUrl}/output/${item.filename.split('.')[0]}/yellowRectangle/result_All_ID_0__${item.filename}`}
+                                                            src={`${expressHttpUrl}/output/${item.filename.split('.')[0]}/yellowRectangle/result_All_ID_0__${item.filename}`}
                                                             style={{height: '160px',}}
                                                         />
                                                         </div>
 
                                                     </Carousel>
-                                                </>
+                                                </div>
                                             }
 
                                         </>
@@ -353,7 +379,7 @@ export function GalleryX(props) {
                         );
                     }} 
                 />
-            </Space>
+            </div>
 
             {/* CSV Preview Modal */}
             <Modal

@@ -36,9 +36,7 @@ export const UploadX = () => {
         >
             <PlusOutlined />
             <div
-                style={{
-                    marginTop: 8,
-                }}
+                // style={{marginTop: 8}}
             >
                 Upload
             </div>

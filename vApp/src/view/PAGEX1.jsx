@@ -72,14 +72,14 @@ const StaticHTML = () => {
                     <Row gutter={16}>
                         <Col className="gutter-row" span={12}>
                             <Card>
-                                <Divider style={{fontSize:'2em',borderColor: '#7cb305'}} >Upload to Input</Divider>
+                                <Divider style={{fontSize:'1.5em',borderColor: '#7cb305'}} >Upload</Divider>
                                 {/*<UploadX/>*/}
                                 <GalleryX upload={true} folderName={'upload'}/>
                             </Card>
                         </Col>
                         <Col className="gutter-row" span={12}>
                             <Card>
-                                <Divider style={{fontSize:'2em',borderColor: '#7cb305'}} >Input</Divider>
+                                <Divider style={{fontSize:'1.5em',borderColor: '#7cb305'}} >Input</Divider>
                                 <GalleryX folderName={'input'}/>
                             </Card>
                         </Col>
