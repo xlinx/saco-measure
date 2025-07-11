@@ -118,14 +118,16 @@ function App() {
 
     const HeaderLeft = () => {
         return (
-            <Image src={sacoSvgLogo3} height={'200px'} style={{padding:'-0px'}} className=" logo-spin "/>
+            <Image
+            style={{maxHeight: '200px',minHeight:'130px'}}
+                src={sacoSvgLogo3} className=" logo-spin "/>
         )
     }
     const HeaderCenter = () => {
         return (
-            <span style={{ fontWeight: 'bold', fontSize: '20px', padding: '0px', margin: '0px' }}>
+            <div style={{display:'inline',width:'100%', fontWeight: 'bold', fontSize: '2em', padding: '0px', margin: '0px' }}>
                 Sarco Measure Center v.0710
-            </span>
+            </div>
         )
     }
 
@@ -138,13 +140,13 @@ function App() {
                             animation: s1 ? 'specialFade 2s forwards ease' : 'specialFadeRed 4s forwards ease'
 
                         }} />
-                        &nbsp; AI.Model.Server.info
+                        &nbsp; AI
                         <SwapOutlined style={{
                             // "-webkit-transform": scale(-1,1),
                             transform: s1 ? 'scale(-1,1)' : 'scale(1,1)',
                             color: s1 ? '#fff' : '#fff'
                         }} />
-                        &nbsp;{APP_IP}&nbsp;|&nbsp;{RX_TS}
+                        &nbsp;Server&nbsp;{RX_TS}
                     </Tag>
 
             </>
@@ -164,7 +166,9 @@ function App() {
             }}
         >
             <Layout >
-                <Header id="app_header" className="appHeader">
+                <Header id="app_header" className="appHeader"
+                        style={{width:'100vw'}}
+                >
                     <Row>
                         <Col span={7}> {HeaderLeft()}</Col>
                         <Col span={10}>{HeaderCenter()}</Col>

@@ -19,8 +19,10 @@ import {UploadX} from "./UploadX.jsx";
 import {FileTextOutlined, PictureOutlined, FileExcelOutlined, FilePdfOutlined, FolderOpenOutlined, DownloadOutlined} from '@ant-design/icons';
 
 import * as path from "path";
+import {useStoreX} from "../model/StoreX.jsx";
 
 export function GalleryX(props) {
+    const {EXPRESS_REPONSE_200}=useStoreX();
     const [filter, setfilter] = useState(props.filter);
     const [folderName, setFolderName] = useState(props.folderName);
     const [loading, setLoading] = useState(false);
@@ -51,6 +53,7 @@ export function GalleryX(props) {
             console.log('window.location.protocol=',window.location.protocol)
             // setLoading(true);
             const response = await fetch(`${expressUrl}/files?foldername=${folderName}&filter=${searchText}&sort=modified&order=desc`);
+
             const data = await response.json();
             
             if (data.success) {

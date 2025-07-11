@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-	 version="1.1" width="500" height="500" viewBox="0 0 500 500" xml:space="preserve">
+	 version="1.1" viewBox="0 0 500 500" xml:space="preserve">
 <desc>Created with Fabric.js 5.2.4</desc>
 <defs>
 </defs>
@@ -12,7 +12,14 @@
 <g transform="matrix(Infinity NaN NaN Infinity 0 0)" id="232d6269-24ff-4b55-b022-7324ef666a65"  >
 </g>
 <g transform="matrix(5.2 0 0 5.2 250 80)"  >
-<path style="stroke: rgb(63,255,0); stroke-width: 10; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(31,70,255); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-50, -50)" d="M 94.75 50 C 94.75 56.213 89.514 61.25 83.054 61.25 L 16.946 61.25 C 10.486 61.25 5.25 56.213 5.25 50 L 5.25 50 C 5.25 43.787 10.486 38.75 16.945999999999998 38.75 L 83.053 38.75 C 89.514 38.75 94.75 43.787 94.75 50 L 94.75 50 z" stroke-linecap="round" />
+<path style="stroke: rgb(63,255,0); stroke-width: 5;
+stroke-dasharray: none; stroke-linecap: butt;
+stroke-dashoffset: 0; stroke-linejoin: miter;
+stroke-miterlimit: 4; fill: rgb(31,70,255); fill-rule:
+nonzero; opacity: 1;" vector-effect="non-scaling-stroke"
+	  transform=" translate(-50, -50)"
+	  d="M 94.75 50 C 94.75 56.213 89.514 61.25 83.054 61.25 L 16.946 61.25 C 10.486 61.25 5.25 56.213 5.25 50 L 5.25 50 C 5.25 43.787 10.486 38.75 16.945999999999998 38.75 L 83.053 38.75 C 89.514 38.75 94.75 43.787 94.75 50 L 94.75 50 z"
+	  stroke-linecap="round" />
 </g>
 <g transform="matrix(1.19 0 0 1.19 250 80)" style="" id="ccb06456-f30a-4e2d-849c-493436843146"  >
 		<text xml:space="preserve" font-family="Lato" font-size="47" font-style="normal" font-weight="400" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-168.42" y="14.76" >|||\\\||\\\|||\\\||||||</tspan></text>

@@ -30,7 +30,7 @@ export const useStoreX = create((set, get) => ({
     UDP_PORT:62202,
     TCP_PORT:62203,
     RX_TS: '',
-
+    EXPRESS_REPONSE_200:false,
     TX_JSON: {WHO: "WSC", CMD: "DECADE.TW",TS:''},
     RX_JSON:{},
 
