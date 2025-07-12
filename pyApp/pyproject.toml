@@ -1,0 +1,42 @@
+[project]
+name = "sarcomeasure"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "x", email = "x@x.tw" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "joblib==1.4.2",
+    "numpy==2.1.1",
+    "opencv-python==4.11.0.86",
+    "pandas==2.2.3",
+    "ultralytics==8.3.162",
+    "uv-build==0.7.20"
+]
+
+[project.scripts]
+sarcomeasure = "sarcomeasure:main"
+
+#[project.optional-dependencies]
+#dev = ["uv_build","pytest", "coverage", "ruff"]
+
+[build-system]
+requires = ["uv_build>=0.7.20,<0.8.0"] # Example version range
+build-backend = "uv_build"
+#
+#[tool.pytest.ini_options]
+#addopts = "--tb=short -q"
+#testpaths = ["tests"]
+#
+#[tool.coverage.run]
+#branch = true
+#source = ["src/sarcomeasure"]
+#
+#[tool.coverage.report]
+#show_missing = true
+
+#ruff check src tests
+#ruff format src tests
+#uv build --sdist --wheel
