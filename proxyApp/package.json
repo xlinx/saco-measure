@@ -19,6 +19,7 @@
   "dependencies": {
     "archiver": "^7.0.1",
     "express": "^5.1.0",
+    "google-auth-library": "^10.1.0",
     "ip": "^2.0.1",
     "multer": "^2.0.1",
     "node-html-better-parser": "1.4.11",

@@ -28,8 +28,9 @@
     "antd": "5.26.3",
     "antd-mobile-icons": "latest",
     "antd-style": "^3.7.1",
+    "google-auth-library": "^10.1.0",
     "inferencejs": "^1.0.16",
-
+    "jwt-decode": "^4.0.0",
     "react": "^19.0.0",
     "react-bootstrap-icons": "^1.11.5",
     "react-dom": "^19.0.0",

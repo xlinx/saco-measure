@@ -14,7 +14,7 @@ import {
     Menu,
     theme,
     ConfigProvider,
-    Slider, Input, Row, Col, Timeline,
+    Slider, Input, Row, Col, Timeline, Tag,
 
 } from 'antd';
 import {ClockCircleOutlined, HomeOutlined, UserOutlined} from '@ant-design/icons';
@@ -30,6 +30,7 @@ import {MenuUnfoldOutlined,AudioOutlined} from "@ant-design/icons";
 // import Marquee from "react-fast-marquee";
 // import {UploadX} from "./UploadX.jsx";
 import GalleryX from "./GalleryX.jsx";
+import {useStoreX} from "../model/StoreX.jsx";
 
 
 
@@ -38,7 +39,8 @@ import GalleryX from "./GalleryX.jsx";
 
 const StaticHTML = () => {
     // const navigate = useNavigate();
-
+    const { user } = useStoreX()
+    console.log('JWTuser',user)
     return (
             <Layout >
                 <Content style={{  margin:'0px',padding: '20px' }}>
@@ -54,10 +56,10 @@ const StaticHTML = () => {
                             {
                                 href: '',
                                 title: (
-                                    <>
-                                        <UserOutlined />
-                                        <span>Ying-Chang Hsueh</span>
-                                    </>
+                                    <Tag color={'warning'} icon={<UserOutlined />}>
+
+                                        {user.name?<span>{user.name}</span>:<span>ViewOnly</span>}
+                                    </Tag>
                                 ),
                             },
                             {

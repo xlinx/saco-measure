@@ -3,6 +3,7 @@ import './App.css'
 
 import './App.css'
 import {
+    Button,
     Col,
     ConfigProvider, Flex, Image,
     Layout,
@@ -22,12 +23,20 @@ import PAGEX3 from './view/PAGEX3.jsx'
 import PAGEX4 from './view/PAGEX4.jsx'
 // import { WebsocketClientR } from './model/WebsocketClientR.js'
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { AlertFilled, LeftOutlined, MenuUnfoldOutlined, SwapOutlined } from '@ant-design/icons'
+import {
+    AlertFilled, FolderViewOutlined,
+    FormOutlined, FundViewOutlined,
+    LeftOutlined,
+    MenuUnfoldOutlined,
+    SwapOutlined, SyncOutlined,
+    UserOutlined
+} from '@ant-design/icons'
 const { Header, Content, Footer } = Layout;
 
 import { createStyles } from 'antd-style';
 import sacoSvgLogo3 from "./assets/sacoSvgLogo3.svg";
-
+// import { OAuth2Client } from 'google-auth-library';
+import { jwtDecode } from "jwt-decode";
 const useStyle = createStyles(({ prefixCls, css }) => ({
     linearGradientButton: css`
     &.${prefixCls}-btn-primary:not([disabled]):not(.${prefixCls}-btn-dangerous) {
@@ -98,11 +107,16 @@ function BoardX(prop) {
 export let websocketClientR = undefined
 
 function App() {
+    const hostname = window.location.hostname;
+    let expressUrl = window.location.protocol+"//"+hostname+(hostname.startsWith('192')||hostname.startsWith('local')?":7777":"");
+    let expressHttpUrl = expressUrl;
 
+    const google_oauth_client_id='977804593988-4kuovtd6l3s88ba2srcia3q8ok3cafqk.apps.googleusercontent.com';
+    // const client = new OAuth2Client(google_oauth_client_id);
     const [InitPageID, setInitPageID] = useState('/tab1')
     // const {RX_STR,TX_JSON,TX_STR,setRX_STR,setRX_JSON} = useStoreXMulti('RX_STR','TX_JSON','TX_STR','setRX_STR','setRX_JSON');
-    const { APP_IP, RX_TS, BOX_TS, } = useStoreX()
-
+    const { user, setUser, RX_TS, BOX_TS, } = useStoreX()
+    // const [user, setUser] = useState(null);
     const [showHighlight, setShowHighlight] = useState(false)
     const [showHighlight2, setShowHighlight2] = useState(false)
     useEffect(() => {
@@ -116,17 +130,73 @@ function App() {
         setShowHighlight2(!showHighlight2)
     }, [BOX_TS])
 
+    const googleButtonRef = useRef(null);
+
+    useEffect(() => {
+         function renderGoogleButton() {
+        if (window.google && googleButtonRef.current) {
+            window.google.accounts.id.initialize({
+                client_id: google_oauth_client_id,
+                callback: handleCredentialResponse,
+            });
+            window.google.accounts.id.renderButton(
+                googleButtonRef.current,
+                {
+                    type: 'standard',
+                    theme: 'filled_black',
+                    size: 'medium',
+                    shape: 'pill',
+                    logo_alignment: 'left',
+                    text: 'signin'
+                }
+            );
+        }
+    }
+
+    // Try immediately
+    renderGoogleButton();
+
+    // If not loaded, poll until available
+    const interval = setInterval(() => {
+        // if (window.google && googleButtonRef.current) {
+        //     renderGoogleButton();
+        //     clearInterval(interval);
+        // }
+    }, 5000);
+
+    // Cleanup
+    return () => clearInterval(interval);
+    }, []);
+
+
+
+    useEffect(() => {
+        const token = localStorage.getItem('google_id_token');
+        if (token) {
+            setUser(jwtDecode(token));
+        }
+    }, []);
+
+    function handleCredentialResponse(response) {
+        localStorage.setItem('google_id_token', response.credential);
+        setUser(jwtDecode(response.credential));
+    }
+
     const HeaderLeft = () => {
-        return (
-            <Image
-            style={{maxHeight: '200px',minHeight:'140px'}}
-                src={sacoSvgLogo3} className=" logo-spin "/>
+        return (<>
+
+                <Image
+                style={{maxHeight: '200px',minHeight:'140px'}}
+                    src={(sacoSvgLogo3)} className=" logo-spin "/>
+            </>
+
         )
     }
     const HeaderCenter = () => {
         return (
             <div style={{display:'inline',width:'100%', fontWeight: 'bold', fontSize: '2em', padding: '0px', margin: '0px' }}>
                 Sarco Measure Center v.0710
+
             </div>
         )
     }
@@ -184,15 +254,57 @@ function App() {
                 <Header id="app_header" className="appHeader"
                         style={{width:'100vw'}}
                 >
-                    <Row>
-                        <Col span={7}> {HeaderLeft()}</Col>
-                        <Col span={10}>{HeaderCenter()}</Col>
-                        <Col span={7}>
-                            {/*<HeaderRight s1={showHighlight} s2={showHighlight2}/>*/}
-                            {HeaderRight(showHighlight,showHighlight2)}
-                        </Col>
+                    <Flex justify={'space-between'}
+                          align={'flex-start'}
+                          gap={'10px'} >
+                        <div > {HeaderLeft()}</div>
 
-                    </Row>
+
+                        <div >{HeaderCenter()}</div>
+
+
+
+                        {/*<div >*/}
+                        {/*    {user?(<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>*/}
+                        {/*        <img src={user.picture} style={{ margin: '8px', height: '50px', borderRadius: '50%' }} alt="user" />*/}
+                        {/*    </div>):(<Tag>ViewOnly</Tag>)}*/}
+                        {/*</div>*/}
+                        <div>
+                            {HeaderRight(showHighlight,showHighlight2)}
+                        </div>
+
+                        <div>
+                            {user?(
+                                <>
+                                <Tag color={'warning'} icon={<UserOutlined />}>
+                                    <span>{user.name}</span>
+                                </Tag>
+                                    <Tag color={'warning'} icon={<UserOutlined />}>
+                                        <span>{user.email}</span>
+                                    </Tag>
+                                <Tag color={'success'} icon={<SyncOutlined spin />}>
+                                    read-write
+                                </Tag>
+                                    <Button size="small" type="primary" onClick={() => {
+                                localStorage.removeItem('google_id_token');
+                                setUser(null);
+                                window.location.reload();
+                            }}>
+                                Logout
+                            </Button></>):
+                                (<Space>
+                                    <Tag style={{fontSize:'1.2em'}} color={'default'} icon={<FolderViewOutlined />} >
+                                        view-only
+                                    </Tag>
+
+                                    <div style={{display: `${user}? 'none' : ''`,margin:'1em',colorScheme: 'light'}}
+                                             ref={googleButtonRef}
+                            /></Space>)}
+                        </div>
+
+
+
+                    </Flex>
                 </Header>
                 <Content id="app_content" style={{
                     // top: '48px',

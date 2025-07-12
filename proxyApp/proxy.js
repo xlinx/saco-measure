@@ -26,6 +26,10 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+import { OAuth2Client } from 'google-auth-library';
+const google_oauth_client_id='977804593988-4kuovtd6l3s88ba2srcia3q8ok3cafqk.apps.googleusercontent.com';
+const client = new OAuth2Client(google_oauth_client_id);
+
 
 let auto_update=false;
 let wss = undefined;
@@ -40,7 +44,6 @@ const folder_home_sarcoMeasure_upload = path.join(folder_home_sarcoMeasure, 'upl
 const folder_home_sarcoMeasure_dist = path.join(__dirname, 'dist');
 const folder_home_sarcoMeasure_www = path.join(folder_home_sarcoMeasure, 'www');
 const configFilePath = path.join(folder_home_sarcoMeasure_www, 'config.txt');
-
 let last_CMD = "";
 let CMD_QUEUE = []
 const sslOptions = {//openssl req -nodes -new -x509 -keyout cert/key.pem -out cert/cert.pem -days 365
@@ -192,6 +195,57 @@ async function multerServer(port){
     app.use('/uploads', express.static(folder_home_sarcoMeasure_upload));
     app.use('/', express.static(folder_home_sarcoMeasure_dist));
 
+    // app.get('/login', (req, res) => {
+    //     res.send(`
+    //       <!DOCTYPE html>
+    //       <html>
+    //       <head>
+    //         <title>Google Login</title>
+    //         <script src="https://accounts.google.com/gsi/client" async defer></script>
+    //       </head>
+    //       <body>
+    //         <h2>SarcoMeasure Login with Google</h2>
+    //         <div id="g_id_onload"
+    //              data-client_id="${google_oauth_client_id}"
+    //              data-callback="handleCredentialResponse">
+    //         </div>
+    //         <div class="g_id_signin" data-type="standard"></div>
+    //         <script>
+    //           function handleCredentialResponse(response) {
+    //             // Send the JWT to your backend for verification
+    //             fetch('/auth/google', {
+    //               method: 'POST',
+    //               headers: { 'Content-Type': 'application/json' },
+    //               body: JSON.stringify({ credential: response.credential })
+    //             })
+    //             .then(res => res.json())
+    //             .then(data => {
+    //               if(data.success) {
+    //                 alert('Login successful!\\nWelcome, ' + data.name);
+    //               } else {
+    //                 alert('Login failed!');
+    //               }
+    //             });
+    //           }
+    //         </script>
+    //       </body>
+    //       </html>
+    //     `);
+    //   });
+    // app.post('/auth/google', express.json(), async (req, res) => {
+    //   const { credential } = req.body;
+    //   try {
+    //     const ticket = await client.verifyIdToken({
+    //       idToken: credential,
+    //       audience: google_oauth_client_id,
+    //     });
+    //     const payload = ticket.getPayload();
+    //     // You can now use payload.email, payload.name, etc.
+    //     res.json({ success: true, name: payload.name, email: payload.email });
+    //   } catch (err) {
+    //     res.json({ success: false, error: err.message });
+    //   }
+    // });
     // GET route to serve upload form
     app.get('/upload-form', (req, res) => {
         res.send(`
