@@ -1,5 +1,4 @@
 #imutils==0.5.4
-joblib==1.4.2
 #matplotlib==3.10.0
 #numpy==1.26.4
 #opencv_python==4.5.3.56
@@ -8,21 +7,22 @@ joblib==1.4.2
 #seaborn==0.13.2
 #scikit-image==0.25.1
 #tqdm==4.67.1
-
 #imutils==0.5.4
 #joblib==1.1.0
 #matplotlib==3.4.3
-numpy==2.1.1
-opencv_python==4.11.0.86
-pandas==2.2.3
 #scikit_image==0.18.3
 #scipy==1.7.1
 #seaborn==0.11.2
 #tqdm==4.62.3
-
 #pipreqs==lastest
-ultralytics==8.3.162
 #tensorflow==2.15.0
 #tensorflow-cpu==2.15.0
 #tensorflowjs==2.0.0
+
+joblib==1.4.2
+numpy==2.1.1
+opencv_python==4.11.0.86
+pandas==2.2.3
+ultralytics==8.3.162
+
 
