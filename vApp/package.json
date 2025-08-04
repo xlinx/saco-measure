@@ -22,9 +22,9 @@
     "py_AI": "pm2 start /var/www/node/sarco_pyApp/sarcoFullAI.py --interpreter /var/www/node/sarco_pyApp/venv/bin/python3"
   },
   "dependencies": {
-    "@ant-design/icons": "^5.6.1",
     "@electron/remote": "^2.1.2",
     "@flmngr/flmngr-react": "^2.0.4",
+    "@ant-design/icons": "^5.6.1",
     "antd": "5.26.3",
     "antd-mobile-icons": "latest",
     "antd-style": "^3.7.1",

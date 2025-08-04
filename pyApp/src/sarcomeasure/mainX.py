@@ -40,12 +40,21 @@ from joblib import Parallel, delayed
 # DECADE_MODEL='best_redSeg_ultralytics.pt'
 ALL_FORMAT=('*.png', '*.jpg','*.tif')
 ALL_FORMAT_STR='*.{png,jpg,tif}'
-DECADE_MODEL='redv1.pt'
+# DECADE_MODEL='colab.yolo11x.v10.pt'
+# DECADE_MODEL='colab.yolo8l.v10.pt'
+DECADE_MODEL='yellow.v10.pt'
+# DECADE_MODEL='redv1.pt'
+
 home = Path.home().joinpath('sarcoMeasure')
 activeCount=0
 loopCount=0
 yolo_model={}
-
+CONFIDENCE_THRESHOLDS = {
+    "entryConf":0.01,
+    "redSpace": 0.01,       # Confidence threshold for redSpace
+    "blueDAPI": 0.01,       # Confidence threshold for redSpace
+    "other": 0.8           # Default confidence for other classes
+}
 class BColors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -86,6 +95,7 @@ class SOTA_ALL_VAR():
 
 
 def initAll() -> None:
+    global yolo_model
     # Path_X=dict()
     # for f in [e.value for e in fNameX]:
     for f in fNameX:
@@ -235,16 +245,8 @@ def thread_safe_predict(_yolo_model, _image_path):
     #     print('[][start-predict][000][which_class]=', which_class_key)
     for which_class_key in _yolo_model.names:
         which_class=_yolo_model.names[which_class_key]
-
-
-        confX=0.01
-        yolo_results=[]
-        while len(yolo_results)==0 and confX > 0 :
-            print('[][start-predict][0][trying conf]=', BColors.WARNING ,confX,BColors.ENDC, which_class)
-            yolo_results = _yolo_model.predict(source=_image_path, classes=[which_class_key], conf=confX)
-            confX-=0.0001
-            if len(yolo_results)>0 :
-                break
+        confX=CONFIDENCE_THRESHOLDS.get(which_class,CONFIDENCE_THRESHOLDS.get('other'))
+        yolo_results = _yolo_model.predict(source=_image_path, classes=[which_class_key], conf= confX)
         classFolder = imgNameFolder.joinpath(which_class)
         cropFolder = classFolder.joinpath('crop')
         cropFolder.mkdir(mode=0o777, parents=True, exist_ok=True)
@@ -252,30 +254,23 @@ def thread_safe_predict(_yolo_model, _image_path):
         maskFolder.mkdir(mode=0o777, parents=True, exist_ok=True)
         resultFolder = classFolder.joinpath('result')
         resultFolder.mkdir(mode=0o777, parents=True, exist_ok=True)
-
-
-        print('[][start-predict][0][using conf]=', BColors.WARNING ,confX,BColors.ENDC)
-        print('[][start-predict][0][using classFolder]=', BColors.WARNING ,classFolder,BColors.ENDC)
-        print('[][start-predict][0][using cropFolder]=', BColors.WARNING ,cropFolder,BColors.ENDC)
-        # print('[][start-predict][0][using isoFolder]=', BColors.WARNING ,isoFolder,BColors.ENDC)
-        print('[][start-predict][0][using len(yolo_results)]=', len(yolo_results))
-        # print('[][start-predict][0][using yolo_results]=', yolo_results)
-
+        print(f'[][start-predict][0]{BColors.WARNING}[using conf]={confX} cropFolder={cropFolder} len(yolo_results)={len(yolo_results)} {BColors.ENDC}')
         for result_index in range(len(yolo_results)):
-            # for result in yolo_results:
-
-
             result=yolo_results[result_index]
             boxes = result.boxes.cpu().numpy()
             keypoints = result.keypoints.cpu().numpy()
+            masks = result.masks
+            # print(f'[][start-predict][1] result{result}, boxes{boxes}, keypoints{keypoints}, masks{masks} ')
+
             # masks = result.masks.cpu().numpy()
             # probs = result.probs.cpu().numpy()
             # obb = result.obbs.cpu().numpy()
-            result.save(filename=classFolder.joinpath('result_All_ID_' + str(result_index)+'__' + Path(_image_path).name) )
-            result.save_crop(save_dir=cropFolder,file_name='result_Crop_ID_' + str(result_index)+'__' + Path(_image_path).name)
-            result.save_txt(txt_file=classFolder.joinpath('result_Txt_ID_' + str(result_index)+'__' + Path(_image_path).stem+'.txt') )
+            endingFilename=Path(_image_path).name
+            result.save(filename=classFolder.joinpath('R_Ori__' + endingFilename) )
+            result.save_crop(save_dir=cropFolder,file_name='R_Crop__' + endingFilename)
+            result.save_txt(txt_file=classFolder.joinpath('R_Txt__' + endingFilename+'.txt') )
 
-            masks = result.masks  # Masks object for segmentation masks outputs
+
             if masks is not None:
                 for index in range(len(masks)):
                     img = numpy.copy(yolo_results[result_index].orig_img)
@@ -289,7 +284,7 @@ def thread_safe_predict(_yolo_model, _image_path):
                     # save_path_iso= isoFolder.joinpath('iso.' + str(index) + Path(_image_path).suffix)
                     cv2.imwrite(maskFolder, isolated)
 
-            print('[][start-predict][1][len]=', BColors.BOLD ,len(boxes),len(keypoints),BColors.ENDC)
+            print(f'[][start-predict][2]{BColors.BOLD}[len]=len(boxes){len(boxes)} len(keypoints){len(keypoints)} {BColors.ENDC}')
             # ''' 0---1
             #        /
             #       /
@@ -297,7 +292,7 @@ def thread_safe_predict(_yolo_model, _image_path):
             # '''
             list = []
             img_with_lines = numpy.copy(yolo_results[result_index].orig_img)
-            drawRedLine_filename = classFolder.joinpath(f'predict_{which_class}__' + Path(_image_path).name)
+            drawRedLine_filename = classFolder.joinpath(f'conf{confX}_predict_{which_class}__' + Path(_image_path).name)
             for box_index in range(len(boxes)):
                 # for box in boxes:
                 box = boxes[box_index]
@@ -358,9 +353,9 @@ def thread_safe_predict(_yolo_model, _image_path):
                 list.append(df)
 
 
-
-            df = pd.concat(list)
-            df.to_csv(classFolder.joinpath('AI.' +which_class+ '.predict.box.csv'), index=False)
+            if len(list)>0:
+                df = pd.concat(list)
+                df.to_csv(classFolder.joinpath('AI.' +which_class+ '.predict.box.csv'), index=False)
 
             # --- Transparent box background plot ---
             # Create a transparent image (RGBA)
